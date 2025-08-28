@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Reglas para jugadores - solo lectura pública, escritura solo para admin autenticado
+    match /players/{playerId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == 'admin@ligabillar.com';
+    }
+    
+    // Reglas para grupos - solo lectura pública, escritura solo para admin autenticado
+    match /groups/{groupId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == 'admin@ligabillar.com';
+    }
+    
+    // Reglas para partidos - solo lectura pública, escritura solo para admin autenticado
+    match /matches/{matchId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == 'admin@ligabillar.com';
+    }
+  }
+}

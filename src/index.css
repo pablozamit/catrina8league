@@ -1,0 +1,283 @@
+/* Directivas de Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Importar fuentes de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;700&display=swap');
+
+:root {
+  /* Colores principales */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #2a2a2a;
+  
+  /* Colores neón */
+  --neon-blue: #00f3ff;
+  --neon-purple: #bf00ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-red: #ff073a;
+  --neon-orange: #ff6b35;
+  
+  /* Colores de texto */
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #888888;
+  
+  /* Sombras neón */
+  --shadow-blue: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
+  --shadow-purple: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple), 0 0 30px var(--neon-purple);
+  --shadow-green: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--neon-green);
+  --shadow-gold: 0 0 10px var(--neon-gold), 0 0 20px var(--neon-gold), 0 0 30px var(--neon-gold);
+  
+  /* Fuentes */
+  --font-title: 'Orbitron', monospace;
+  --font-body: 'Exo 2', sans-serif;
+  
+  /* Transiciones */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, #0f0f23 50%, var(--bg-primary) 100%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Efecto de fondo animado */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(0, 243, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(191, 0, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(57, 255, 20, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Títulos */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: var(--shadow-blue);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  color: var(--neon-gold);
+  text-shadow: var(--shadow-gold);
+}
+
+h3 {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: var(--neon-green);
+}
+
+/* Enlaces */
+a {
+  color: var(--neon-blue);
+  text-decoration: none;
+  transition: var(--transition-fast);
+  position: relative;
+}
+
+a:hover {
+  color: var(--neon-purple);
+  text-shadow: var(--shadow-purple);
+}
+
+/* Botones */
+.btn {
+  font-family: var(--font-title);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border: 2px solid;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: var(--transition-medium);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: var(--transition-medium);
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn-primary {
+  color: var(--neon-blue);
+  border-color: var(--neon-blue);
+}
+
+.btn-primary:hover {
+  background: var(--neon-blue);
+  color: var(--bg-primary);
+  box-shadow: var(--shadow-blue);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  color: var(--neon-purple);
+  border-color: var(--neon-purple);
+}
+
+.btn-secondary:hover {
+  background: var(--neon-purple);
+  color: var(--bg-primary);
+  box-shadow: var(--shadow-purple);
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  color: var(--neon-green);
+  border-color: var(--neon-green);
+}
+
+.btn-success:hover {
+  background: var(--neon-green);
+  color: var(--bg-primary);
+  box-shadow: var(--shadow-green);
+  transform: translateY(-2px);
+}
+
+.btn-warning {
+  color: var(--neon-gold);
+  border-color: var(--neon-gold);
+}
+
+.btn-warning:hover {
+  background: var(--neon-gold);
+  color: var(--bg-primary);
+  box-shadow: var(--shadow-gold);
+  transform: translateY(-2px);
+}
+
+/* Inputs */
+input, textarea, select {
+  font-family: var(--font-body);
+  background: var(--bg-secondary);
+  border: 2px solid var(--bg-tertiary);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+/* Tarjetas */
+.card {
+  background: rgba(26, 26, 26, 0.8);
+  border: 1px solid var(--bg-tertiary);
+  border-radius: 12px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  transition: var(--transition-medium);
+}
+
+.card:hover {
+  border-color: var(--neon-blue);
+  box-shadow: 0 8px 32px rgba(0, 243, 255, 0.1);
+  transform: translateY(-4px);
+}
+
+/* Animaciones de carga */
+@keyframes pulse-neon {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+  }
+  50% {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 2s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .card {
+    padding: 16px;
+  }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--neon-purple), var(--neon-blue));
+}
