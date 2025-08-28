@@ -3,19 +3,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home, Calendar, Trophy, Settings, LogIn, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { logoutUser } from '../firebase/auth';
 
 const Header: React.FC = () => {
-  const { user, isAdmin } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const handleLogout = async () => {
-    try {
-      await logoutUser();
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    }
+  const handleLogout = () => {
+    logout();
   };
 
   const navigation = [
@@ -75,21 +70,19 @@ const Header: React.FC = () => {
 
           {/* Botones de Auth */}
           <div className="hidden md:flex items-center space-x-4">
-            {user ? (
+            {isAuthenticated ? (
               <div className="flex items-center space-x-4">
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-300 ${
-                      isActive('/admin')
-                        ? 'bg-green-600/20 text-green-400 shadow-lg shadow-green-500/25'
-                        : 'text-gray-300 hover:text-green-400 hover:bg-green-600/10'
-                    }`}
-                  >
-                    <Settings size={18} />
-                    <span className="font-medium">Admin</span>
-                  </Link>
-                )}
+                <Link
+                  to="/admin"
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-300 ${
+                    isActive('/admin')
+                      ? 'bg-green-600/20 text-green-400 shadow-lg shadow-green-500/25'
+                      : 'text-gray-300 hover:text-green-400 hover:bg-green-600/10'
+                  }`}
+                >
+                  <Settings size={18} />
+                  <span className="font-medium">Admin</span>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-2 px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-all duration-300"
@@ -146,18 +139,16 @@ const Header: React.FC = () => {
                 );
               })}
               
-              {user ? (
+              {isAuthenticated ? (
                 <>
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:text-green-400 hover:bg-green-600/10 transition-all duration-300"
-                    >
-                      <Settings size={18} />
-                      <span className="font-medium">Admin</span>
-                    </Link>
-                  )}
+                  <Link
+                    to="/admin"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:text-green-400 hover:bg-green-600/10 transition-all duration-300"
+                  >
+                    <Settings size={18} />
+                    <span className="font-medium">Admin</span>
+                  </Link>
                   <button
                     onClick={() => {
                       handleLogout();
