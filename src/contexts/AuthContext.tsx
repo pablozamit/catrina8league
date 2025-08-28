@@ -1,11 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from 'firebase/auth';
-import { observeAuthState, ADMIN_EMAIL } from '../firebase/auth';
+import React, { createContext, useContext, useState } from 'react';
 
 interface AuthContextType {
-  user: User | null;
-  isAdmin: boolean;
-  loading: boolean;
+  isAuthenticated: boolean;
+  login: (password: string) => boolean;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,29 +21,29 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return sessionStorage.getItem('isAuthenticated') === 'true';
+  });
 
-  useEffect(() => {
-    const unsubscribe = observeAuthState((user) => {
-      setUser(user);
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  const isAdmin = user?.email === ADMIN_EMAIL;
-
-  const value: AuthContextType = {
-    user,
-    isAdmin,
-    loading
+  const login = (password: string) => {
+    if (password === import.meta.env.VITE_ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('isAuthenticated', 'true');
+      return true;
+    }
+    return false;
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const logout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('isAuthenticated');
+  };
+
+  const value: AuthContextType = {
+    isAuthenticated,
+    login,
+    logout
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
