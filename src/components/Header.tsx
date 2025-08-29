@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Calendar, Trophy, Settings, LogIn, LogOut, Menu, X } from 'lucide-react';
+import { Home, Calendar, Trophy, Settings, LogIn, LogOut, Menu, X, MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -19,6 +19,7 @@ const Header: React.FC = () => {
     { name: t('header.nav.home'), path: '/', icon: Home },
     { name: t('header.nav.calendar'), path: '/calendario', icon: Calendar },
     { name: t('header.nav.standings'), path: '/clasificaciones', icon: Trophy },
+    { name: t('header.nav.schedule'), path: '/programar', icon: MessageCircle },
   ];
 
   const isActive = (path: string) => location.pathname === path;

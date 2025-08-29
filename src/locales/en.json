@@ -4,7 +4,8 @@
       "home": "Home",
       "calendar": "Calendar",
       "standings": "Standings",
-      "admin": "Admin"
+      "admin": "Admin",
+      "schedule": "Schedule Match"
     },
     "logout": "Logout",
     "login": "Login"
