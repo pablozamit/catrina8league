@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Medal, Award, Target, TrendingUp, Users } from 'lucide-react';
+import { Trophy, Medal, Award, Users } from 'lucide-react';
 import { playersService, groupsService, Player, Group } from '../firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -22,11 +22,12 @@ const Standings: React.FC = () => {
         groupsService.getAll()
       ]);
       setPlayers(playersData);
-      setGroups(groupsData);
-      
+      const sortedGroups = groupsData.sort((a, b) => a.nombre.localeCompare(b.nombre));
+      setGroups(sortedGroups);
+
       // Seleccionar el primer grupo por defecto
-      if (groupsData.length > 0 && !selectedGroup) {
-        setSelectedGroup(groupsData[0].nombre);
+      if (sortedGroups.length > 0 && !selectedGroup) {
+        setSelectedGroup(sortedGroups[0].nombre);
       }
     } catch (error) {
       console.error('Error cargando datos:', error);
@@ -43,18 +44,11 @@ const Standings: React.FC = () => {
         if (b.puntos !== a.puntos) {
           return b.puntos - a.puntos;
         }
+        if (b.partidasGanadas !== a.partidasGanadas) {
+          return b.partidasGanadas - a.partidasGanadas;
+        }
         return b.juegosGanados - a.juegosGanados;
       });
-  };
-
-  // Calcular estadísticas del grupo
-  const getGroupStats = (groupName: string) => {
-    const groupPlayers = players.filter(player => player.grupo === groupName);
-    return {
-      totalPlayers: groupPlayers.length,
-      totalPartidas: groupPlayers.reduce((sum, player) => sum + player.partidasJugadas, 0) / 2,
-      totalJuegos: groupPlayers.reduce((sum, player) => sum + player.juegosGanados + player.juegosPerdidos, 0) / 2
-    };
   };
 
   // Obtener icono de posición
@@ -92,7 +86,6 @@ const Standings: React.FC = () => {
   };
 
   const groupPlayers = selectedGroup ? getGroupPlayers(selectedGroup) : [];
-  const groupStats = selectedGroup ? getGroupStats(selectedGroup) : null;
 
   if (loading) {
     return <LoadingSpinner />;
@@ -143,32 +136,8 @@ const Standings: React.FC = () => {
           </motion.div>
         )}
 
-        {selectedGroup && groupStats && (
+        {selectedGroup && (
           <>
-            {/* Estadísticas del grupo */}
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <div className="card bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-blue-500/30 text-center">
-                <Users className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-400">{groupStats.totalPlayers}</div>
-                <div className="text-gray-400">Jugadores</div>
-              </div>
-              <div className="card bg-gradient-to-br from-green-900/30 to-blue-900/30 border-green-500/30 text-center">
-                <Target className="w-8 h-8 text-green-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-400">{groupStats.totalPartidas}</div>
-                <div className="text-gray-400">Partidas Jugadas</div>
-              </div>
-              <div className="card bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-500/30 text-center">
-                <TrendingUp className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-400">{groupStats.totalJuegos}</div>
-                <div className="text-gray-400">Juegos Jugados</div>
-              </div>
-            </motion.div>
-
             {/* Tabla de clasificación */}
             <motion.div
               className="space-y-4"
@@ -313,7 +282,8 @@ const Standings: React.FC = () => {
                   <strong className="text-white">Criterios de Desempate:</strong>
                   <ul className="mt-2 space-y-1">
                     <li>• 1. Mayor puntuación</li>
-                    <li>• 2. Mayor número de juegos ganados</li>
+                    <li>• 2. Mayor número de partidas ganadas</li>
+                    <li>• 3. Mayor número de juegos ganados</li>
                   </ul>
                 </div>
               </div>

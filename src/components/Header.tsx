@@ -26,17 +26,9 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl animate-glow">🎱</span>
-            </div>
-            <div className="hidden md:block">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Liga Billar
-              </h1>
-              <p className="text-xs text-gray-400 uppercase tracking-wider">
-                Rock & Cocktails
-              </p>
             </div>
           </Link>
 
