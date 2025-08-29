@@ -40,17 +40,10 @@ const Standings: React.FC = () => {
     return players
       .filter(player => player.grupo === groupName)
       .sort((a, b) => {
-        // Ordenar por puntos descendente, luego por diferencia de sets
         if (b.puntos !== a.puntos) {
           return b.puntos - a.puntos;
         }
-        const diffA = a.setsGanados - a.setsPerdidos;
-        const diffB = b.setsGanados - b.setsPerdidos;
-        if (diffB !== diffA) {
-          return diffB - diffA;
-        }
-        // Si empatan en puntos y diferencia, ordenar por sets ganados
-        return b.setsGanados - a.setsGanados;
+        return b.juegosGanados - a.juegosGanados;
       });
   };
 
@@ -59,8 +52,8 @@ const Standings: React.FC = () => {
     const groupPlayers = players.filter(player => player.grupo === groupName);
     return {
       totalPlayers: groupPlayers.length,
-      totalMatches: groupPlayers.reduce((sum, player) => sum + player.partidosJugados, 0) / 2,
-      totalSets: groupPlayers.reduce((sum, player) => sum + player.setsGanados + player.setsPerdidos, 0) / 2
+      totalPartidas: groupPlayers.reduce((sum, player) => sum + player.partidasJugadas, 0) / 2,
+      totalJuegos: groupPlayers.reduce((sum, player) => sum + player.juegosGanados + player.juegosPerdidos, 0) / 2
     };
   };
 
@@ -80,8 +73,8 @@ const Standings: React.FC = () => {
 
   // Calcular porcentaje de victorias
   const getWinPercentage = (player: Player) => {
-    if (player.partidosJugados === 0) return 0;
-    return Math.round((player.partidosGanados / player.partidosJugados) * 100);
+    if (player.partidasJugadas === 0) return 0;
+    return Math.round((player.partidasGanadas / player.partidasJugadas) * 100);
   };
 
   // Obtener color según la posición
@@ -166,13 +159,13 @@ const Standings: React.FC = () => {
               </div>
               <div className="card bg-gradient-to-br from-green-900/30 to-blue-900/30 border-green-500/30 text-center">
                 <Target className="w-8 h-8 text-green-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-400">{groupStats.totalMatches}</div>
-                <div className="text-gray-400">Partidos Jugados</div>
+                <div className="text-2xl font-bold text-green-400">{groupStats.totalPartidas}</div>
+                <div className="text-gray-400">Partidas Jugadas</div>
               </div>
               <div className="card bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-500/30 text-center">
                 <TrendingUp className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-400">{groupStats.totalSets}</div>
-                <div className="text-gray-400">Sets Jugados</div>
+                <div className="text-2xl font-bold text-purple-400">{groupStats.totalJuegos}</div>
+                <div className="text-gray-400">Juegos Jugados</div>
               </div>
             </motion.div>
 
@@ -204,12 +197,12 @@ const Standings: React.FC = () => {
                   {groupPlayers.map((player, index) => {
                     const position = index + 1;
                     const winPercentage = getWinPercentage(player);
-                    const setsDiff = player.setsGanados - player.setsPerdidos;
+                    const gamesDiff = player.juegosGanados - player.juegosPerdidos;
                     
                     return (
                       <motion.div
                         key={player.id}
-                        className={`card bg-gradient-to-r ${getPositionColor(position)} hover:scale-[1.02] transition-all duration-300`}
+                        className={`card bg-gradient-to-r ${getPositionColor(position)} hover:scale-[1.02] transition-all duration-300 ${index < 4 ? 'border-2 border-purple-400' : ''}`}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4, delay: 0.05 * index }}
@@ -227,7 +220,7 @@ const Standings: React.FC = () => {
                               <h3 className={`text-lg font-bold truncate ${
                                 position <= 3 ? 'text-white' : 'text-blue-400'
                               }`}>
-                                {player.nombre} {player.apellidos}
+                                {player.nombre}{player.esNovato && ' 👶'}
                               </h3>
                               <div className="text-right">
                                 <div className={`text-xl font-bold ${
@@ -241,30 +234,30 @@ const Standings: React.FC = () => {
                             {/* Estadísticas */}
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-3 text-sm">
                               <div className="text-center">
-                                <div className="text-gray-400">Partidos</div>
-                                <div className="font-semibold text-white">
-                                  {player.partidosJugados}
-                                </div>
+                                  <div className="text-gray-400">Partidas</div>
+                                  <div className="font-semibold text-white">
+                                    {player.partidasJugadas}
+                                  </div>
                               </div>
                               <div className="text-center">
                                 <div className="text-gray-400">Ganados</div>
-                                <div className="font-semibold text-green-400">
-                                  {player.partidosGanados}
-                                </div>
+                                  <div className="font-semibold text-green-400">
+                                    {player.partidasGanadas}
+                                  </div>
                               </div>
                               <div className="text-center">
                                 <div className="text-gray-400">Perdidos</div>
-                                <div className="font-semibold text-red-400">
-                                  {player.partidosPerdidos}
-                                </div>
+                                  <div className="font-semibold text-red-400">
+                                    {player.partidasPerdidas}
+                                  </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400">Sets +/-</div>
-                                <div className={`font-semibold ${
-                                  setsDiff > 0 ? 'text-green-400' : setsDiff < 0 ? 'text-red-400' : 'text-gray-400'
-                                }`}>
-                                  {setsDiff > 0 ? '+' : ''}{setsDiff}
-                                </div>
+                                  <div className="text-gray-400">Juegos +/-</div>
+                                  <div className={`font-semibold ${
+                                    gamesDiff > 0 ? 'text-green-400' : gamesDiff < 0 ? 'text-red-400' : 'text-gray-400'
+                                  }`}>
+                                    {gamesDiff > 0 ? '+' : ''}{gamesDiff}
+                                  </div>
                               </div>
                               <div className="text-center">
                                 <div className="text-gray-400">% Victoria</div>
@@ -320,8 +313,7 @@ const Standings: React.FC = () => {
                   <strong className="text-white">Criterios de Desempate:</strong>
                   <ul className="mt-2 space-y-1">
                     <li>• 1. Mayor puntuación</li>
-                    <li>• 2. Mejor diferencia de sets</li>
-                    <li>• 3. Mayor número de sets ganados</li>
+                    <li>• 2. Mayor número de juegos ganados</li>
                   </ul>
                 </div>
               </div>
