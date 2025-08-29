@@ -166,7 +166,6 @@ const Standings: React.FC = () => {
                   {groupPlayers.map((player, index) => {
                     const position = index + 1;
                     const winPercentage = getWinPercentage(player);
-                    const gamesDiff = player.juegosGanados - player.juegosPerdidos;
                     
                     return (
                       <motion.div
@@ -201,7 +200,7 @@ const Standings: React.FC = () => {
                             </div>
                             
                             {/* Estadísticas */}
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-3 text-sm">
+                            <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mt-3 text-sm">
                               <div className="text-center">
                                   <div className="text-gray-400">Partidas</div>
                                   <div className="font-semibold text-white">
@@ -221,12 +220,16 @@ const Standings: React.FC = () => {
                                   </div>
                               </div>
                               <div className="text-center">
-                                  <div className="text-gray-400">Juegos +/-</div>
-                                  <div className={`font-semibold ${
-                                    gamesDiff > 0 ? 'text-green-400' : gamesDiff < 0 ? 'text-red-400' : 'text-gray-400'
-                                  }`}>
-                                    {gamesDiff > 0 ? '+' : ''}{gamesDiff}
-                                  </div>
+                                <div className="text-gray-400">Juegos Ganados</div>
+                                <div className="font-semibold text-green-400">
+                                  {player.juegosGanados}
+                                </div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-gray-400">Juegos Perdidos</div>
+                                <div className="font-semibold text-red-400">
+                                  {player.juegosPerdidos}
+                                </div>
                               </div>
                               <div className="text-center">
                                 <div className="text-gray-400">% Victoria</div>
