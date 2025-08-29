@@ -8,7 +8,8 @@ import {
   query, 
   orderBy, 
   onSnapshot,
-  Timestamp
+  Timestamp,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from './config';
 
@@ -40,7 +41,7 @@ export interface Match {
   jugador1Nombre: string;
   jugador2Nombre: string;
   grupo: string;
-  fecha: Timestamp;
+  fecha?: Timestamp;
   semana: number;
   resultado?: {
     ganadorId: string;
@@ -143,5 +144,21 @@ export const matchesService = {
       const matches = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Match));
       callback(matches);
     });
+  },
+
+  // Reemplazar todo el calendario de partidos
+  replaceCalendar: async (matches: Omit<Match, 'id'>[]): Promise<void> => {
+    const matchesRef = collection(db, 'matches');
+    const batch = writeBatch(db);
+
+    const existing = await getDocs(matchesRef);
+    existing.forEach((docSnap) => batch.delete(docSnap.ref));
+
+    matches.forEach((match) => {
+      const newRef = doc(matchesRef);
+      batch.set(newRef, match);
+    });
+
+    await batch.commit();
   }
 };
