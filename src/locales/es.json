@@ -4,7 +4,8 @@
       "home": "Inicio",
       "calendar": "Calendario",
       "standings": "Clasificaciones",
-      "admin": "Admin"
+      "admin": "Admin",
+      "schedule": "Programar Partido"
     },
     "logout": "Salir",
     "login": "Entrar"

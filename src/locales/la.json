@@ -4,7 +4,8 @@
       "home": "Domus",
       "calendar": "Calendarium",
       "standings": "Classificatio",
-      "admin": "Admin"
+      "admin": "Admin",
+      "schedule": "Certamen Disponere"
     },
     "logout": "Exire",
     "login": "Intrare"

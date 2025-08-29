@@ -7,6 +7,7 @@ import Calendar from './pages/Calendar';
 import Standings from './pages/Standings';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
+import Schedule from './pages/Schedule';
 import ProtectedRoute from './components/ProtectedRoute';
 import './index.css';
 
@@ -22,8 +23,9 @@ function App() {
               <Route path="/calendario" element={<Calendar />} />
               <Route path="/clasificaciones" element={<Standings />} />
               <Route path="/login" element={<Login />} />
-              <Route 
-                path="/admin" 
+              <Route path="/programar" element={<Schedule />} />
+              <Route
+                path="/admin"
                 element={
                   <ProtectedRoute>
                     <Admin />
