@@ -1,1 +1,19 @@
-File not found: /v1/AUTH_mw/wikipedia-commons-local-public.12/1/12/Flag_of_Burgundy.svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <rect width="1200" height="900" fill="#FFF"/>
+  <g transform="translate(600,450)">
+    <g transform="rotate(45)">
+      <path d="M-600,25 h1200 v-50 h-1200 z" fill="#D21034"/>
+      <path d="M-600,25 h1200 v-50 h-1200 z" transform="rotate(90)" fill="#D21034"/>
+      <g fill="#D21034">
+        <path d="M-450,-15 h50 v30 h-50 z"/>
+        <path d="M-250,-15 h50 v30 h-50 z" transform="rotate(90)"/>
+        <path d="M-450,-15 h50 v30 h-50 z" transform="rotate(180)"/>
+        <path d="M-250,-15 h50 v30 h-50 z" transform="rotate(-90)"/>
+        <path d="M200,-15 h50 v30 h-50 z"/>
+        <path d="M400,-15 h50 v30 h-50 z" transform="rotate(90)"/>
+        <path d="M200,-15 h50 v30 h-50 z" transform="rotate(180)"/>
+        <path d="M400,-15 h50 v30 h-50 z" transform="rotate(-90)"/>
+      </g>
+    </g>
+  </g>
+</svg>
