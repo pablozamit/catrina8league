@@ -3,11 +3,13 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin, Users } from 'lucide-react';
 import { matchesService, Match } from '../firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 
 const Calendar: React.FC = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentWeek, setCurrentWeek] = useState(0);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     loadMatches();
@@ -48,10 +50,15 @@ const Calendar: React.FC = () => {
     return grouped;
   };
 
+  const getLocale = () => {
+    if (i18n.language === 'es') return 'es-ES';
+    return 'en-US';
+  };
+
   const formatDate = (timestamp: any) => {
-    if (!timestamp) return 'Fecha por definir';
+    if (!timestamp) return t('calendar.noDate');
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString('es-ES', {
+    return date.toLocaleDateString(getLocale(), {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -62,7 +69,7 @@ const Calendar: React.FC = () => {
   const formatTime = (timestamp: any) => {
     if (!timestamp) return '20:00';
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleTimeString('es-ES', {
+    return date.toLocaleTimeString(getLocale(), {
       hour: '2-digit',
       minute: '2-digit'
     });
@@ -92,10 +99,10 @@ const Calendar: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-blue-400">
-            Calendario de Partidos
+            {t('calendar.title')}
           </h1>
           <p className="text-xl text-gray-300">
-            Consulta los enfrentamientos programados para cada semana
+            {t('calendar.description')}
           </p>
         </motion.div>
 
@@ -122,13 +129,13 @@ const Calendar: React.FC = () => {
             <div className="px-8 py-3 text-center">
               <div className="flex items-center space-x-2">
                 <CalendarIcon className="w-5 h-5 text-blue-400" />
-                <span className="text-xl font-bold text-blue-400">
-                  Semana {currentWeek + 1}
-                </span>
-              </div>
-              <p className="text-sm text-gray-400 mt-1">
-                {weekMatches.length} partidos programados
-              </p>
+                  <span className="text-xl font-bold text-blue-400">
+                    {t('calendar.week', { week: currentWeek + 1 })}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-400 mt-1">
+                  {t('calendar.scheduledMatches', { count: weekMatches.length })}
+                </p>
             </div>
             
             <button
@@ -156,12 +163,12 @@ const Calendar: React.FC = () => {
             <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center">
               <CalendarIcon className="w-12 h-12 text-blue-400" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-400 mb-4">
-              No hay partidos programados
-            </h3>
-            <p className="text-gray-500">
-              No se encontraron partidos para la semana {currentWeek + 1}
-            </p>
+              <h3 className="text-2xl font-bold text-gray-400 mb-4">
+                {t('calendar.noMatches')}
+              </h3>
+              <p className="text-gray-500">
+                {t('calendar.noMatchesForWeek', { week: currentWeek + 1 })}
+              </p>
           </motion.div>
         ) : (
           <motion.div
@@ -182,14 +189,14 @@ const Calendar: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <Users className="w-6 h-6 text-purple-400" />
-                    <h2 className="text-2xl font-bold text-purple-400">
-                      Grupo {group}
-                    </h2>
+                      <h2 className="text-2xl font-bold text-purple-400">
+                        {t('calendar.group', { group })}
+                      </h2>
                   </div>
                   <div className="flex-1 h-px bg-gradient-to-r from-purple-500/50 to-transparent" />
-                  <span className="text-sm text-gray-400">
-                    {groupMatches.length} partidos
-                  </span>
+                    <span className="text-sm text-gray-400">
+                      {t('calendar.matches', { count: groupMatches.length })}
+                    </span>
                 </div>
 
                 {/* Partidos del grupo */}
@@ -214,7 +221,7 @@ const Calendar: React.FC = () => {
                             ? 'bg-green-600/20 text-green-400 border border-green-500/30'
                             : 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
                         }`}>
-                          {match.completado ? 'Finalizado' : 'Programado'}
+                        {match.completado ? t('calendar.status.finished') : t('calendar.status.scheduled')}
                         </span>
                         <div className="flex items-center space-x-1 text-xs text-gray-400">
                           <Clock className="w-3 h-3" />
@@ -264,7 +271,7 @@ const Calendar: React.FC = () => {
                         <div className="flex items-center justify-between text-sm text-gray-400">
                           <div className="flex items-center space-x-1">
                             <MapPin className="w-3 h-3" />
-                            <span>Mesa de Billar</span>
+                            <span>{t('calendar.location')}</span>
                           </div>
                           <span>{formatDate(match.fecha)}</span>
                         </div>
@@ -274,7 +281,7 @@ const Calendar: React.FC = () => {
                       {match.completado && match.resultado && (
                         <div className="mt-3 p-3 bg-green-600/10 border border-green-500/20 rounded-lg">
                           <div className="text-center">
-                            <span className="text-sm text-gray-400">Ganador:</span>
+                            <span className="text-sm text-gray-400">{t('calendar.winner')}</span>
                             <div className="font-bold text-green-400">
                               {match.resultado.ganadorId === match.jugador1Id
                                 ? match.jugador1Nombre

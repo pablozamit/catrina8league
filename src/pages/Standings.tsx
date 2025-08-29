@@ -3,12 +3,14 @@ import { motion } from 'framer-motion';
 import { Trophy, Medal, Award, Users } from 'lucide-react';
 import { playersService, groupsService, Player, Group } from '../firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 
 const Standings: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedGroup, setSelectedGroup] = useState<string>('');
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadData();
@@ -102,10 +104,10 @@ const Standings: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gold-400">
-            Clasificaciones
+            {t('standings.title')}
           </h1>
           <p className="text-xl text-gray-300">
-            Consulta las posiciones y estadísticas de cada grupo
+            {t('standings.description')}
           </p>
         </motion.div>
 
@@ -129,7 +131,7 @@ const Standings: React.FC = () => {
                   }`}
                 >
                   <Users className="inline-block w-5 h-5 mr-2" />
-                  Grupo {group.nombre}
+                  {t('standings.group', { group: group.nombre })}
                 </button>
               ))}
             </div>
@@ -146,7 +148,7 @@ const Standings: React.FC = () => {
               transition={{ duration: 0.5, delay: 0.4 }}
             >
               <h2 className="text-2xl font-bold text-purple-400 mb-6 text-center">
-                Clasificación - Grupo {selectedGroup}
+                {t('standings.groupTitle', { group: selectedGroup })}
               </h2>
 
               {groupPlayers.length === 0 ? (
@@ -155,10 +157,10 @@ const Standings: React.FC = () => {
                     <Users className="w-8 h-8 text-gray-400" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-400 mb-2">
-                    No hay jugadores en este grupo
+                    {t('standings.noPlayers')}
                   </h3>
                   <p className="text-gray-500">
-                    Agrega jugadores desde el panel de administración
+                    {t('standings.addPlayersHint')}
                   </p>
                 </div>
               ) : (
@@ -202,37 +204,37 @@ const Standings: React.FC = () => {
                             {/* Estadísticas */}
                             <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mt-3 text-sm">
                               <div className="text-center">
-                                  <div className="text-gray-400">Partidas</div>
-                                  <div className="font-semibold text-white">
-                                    {player.partidasJugadas}
-                                  </div>
+                                <div className="text-gray-400">{t('standings.stats.matches')}</div>
+                                <div className="font-semibold text-white">
+                                  {player.partidasJugadas}
+                                </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400">Ganados</div>
-                                  <div className="font-semibold text-green-400">
-                                    {player.partidasGanadas}
-                                  </div>
+                                <div className="text-gray-400">{t('standings.stats.won')}</div>
+                                <div className="font-semibold text-green-400">
+                                  {player.partidasGanadas}
+                                </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400">Perdidos</div>
-                                  <div className="font-semibold text-red-400">
-                                    {player.partidasPerdidas}
-                                  </div>
+                                <div className="text-gray-400">{t('standings.stats.lost')}</div>
+                                <div className="font-semibold text-red-400">
+                                  {player.partidasPerdidas}
+                                </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400">Juegos Ganados</div>
+                                <div className="text-gray-400">{t('standings.stats.gamesWon')}</div>
                                 <div className="font-semibold text-green-400">
                                   {player.juegosGanados}
                                 </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400">Juegos Perdidos</div>
+                                <div className="text-gray-400">{t('standings.stats.gamesLost')}</div>
                                 <div className="font-semibold text-red-400">
                                   {player.juegosPerdidos}
                                 </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400">% Victoria</div>
+                                <div className="text-gray-400">{t('standings.stats.winPercentage')}</div>
                                 <div className={`font-semibold ${
                                   winPercentage >= 70 ? 'text-green-400' :
                                   winPercentage >= 50 ? 'text-yellow-400' : 'text-red-400'
@@ -272,21 +274,21 @@ const Standings: React.FC = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
-              <h3 className="text-lg font-bold text-gray-300 mb-4">Leyenda</h3>
+              <h3 className="text-lg font-bold text-gray-300 mb-4">{t('standings.legend.title')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-400">
                 <div>
-                  <strong className="text-white">Sistema de Puntuación:</strong>
+                  <strong className="text-white">{t('standings.legend.scoring')}</strong>
                   <ul className="mt-2 space-y-1">
-                    <li>• Victoria: 3 puntos</li>
-                    <li>• Derrota: 0 puntos</li>
+                    <li>• {t('standings.legend.victory')}</li>
+                    <li>• {t('standings.legend.defeat')}</li>
                   </ul>
                 </div>
                 <div>
-                  <strong className="text-white">Criterios de Desempate:</strong>
+                  <strong className="text-white">{t('standings.legend.tieBreak')}</strong>
                   <ul className="mt-2 space-y-1">
-                    <li>• 1. Mayor puntuación</li>
-                    <li>• 2. Mayor número de partidas ganadas</li>
-                    <li>• 3. Mayor número de juegos ganados</li>
+                    <li>• {t('standings.legend.criterion1')}</li>
+                    <li>• {t('standings.legend.criterion2')}</li>
+                    <li>• {t('standings.legend.criterion3')}</li>
                   </ul>
                 </div>
               </div>

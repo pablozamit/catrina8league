@@ -1,7 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from '../components/LanguageSelector';
 
 const Home: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen">
       <motion.section
@@ -22,8 +25,9 @@ const Home: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-6xl md:text-8xl font-bold animate-glow"
           >
-            8 Ball League La Catrina 2025
+            {t('home.title')}
           </motion.h1>
+          <LanguageSelector />
         </div>
       </motion.section>
     </div>
