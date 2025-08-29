@@ -16,9 +16,9 @@
     <script type="module">
       import { createChat } from "https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/chat.bundle.es.js";
 
-      // Mostrar solo en la ruta /programar (ajusta si tu ruta real es /Schedule)
-      const onProgramar = location.pathname.toLowerCase().includes("program");
-      if (onProgramar) {
+      // Mostrar solo en la ruta /schedule
+      const onSchedule = location.pathname.toLowerCase().includes("schedule");
+      if (onSchedule) {
         createChat({
           webhookUrl:
             "https://n8n.srv907628.hstgr.cloud/webhook/08edf318-16cd-4aa4-81a5-ea5e4013be78",
