@@ -1,0 +1,68 @@
+{
+  "header": {
+    "nav": {
+      "home": "Inicio",
+      "calendar": "Calendario",
+      "standings": "Clasificaciones",
+      "admin": "Admin"
+    },
+    "logout": "Salir",
+    "login": "Entrar"
+  },
+  "loading": "Cargando...",
+  "home": {
+    "title": "8 Ball League La Catrina 2025"
+  },
+  "calendar": {
+    "title": "Calendario de Partidos",
+    "description": "Consulta los enfrentamientos programados para cada semana",
+    "status": {
+      "finished": "Finalizado",
+      "scheduled": "Programado"
+    },
+    "noDate": "Fecha por definir",
+    "location": "Mesa de Billar",
+    "winner": "Ganador:",
+    "week": "Semana {{week}}",
+    "scheduledMatches": "{{count}} partidos programados",
+    "group": "Grupo {{group}}",
+    "matches": "{{count}} partidos",
+    "noMatches": "No hay partidos programados",
+    "noMatchesForWeek": "No se encontraron partidos para la semana {{week}}"
+  },
+  "standings": {
+    "title": "Clasificaciones",
+    "description": "Consulta las posiciones y estadísticas de cada grupo",
+    "stats": {
+      "matches": "Partidas",
+      "won": "Ganados",
+      "lost": "Perdidos",
+      "gamesWon": "Juegos Ganados",
+      "gamesLost": "Juegos Perdidos",
+      "winPercentage": "% Victoria"
+    },
+    "legend": {
+      "title": "Leyenda",
+      "scoring": "Sistema de Puntuación:",
+      "victory": "Victoria: 3 puntos",
+      "defeat": "Derrota: 0 puntos",
+      "tieBreak": "Criterios de Desempate:",
+      "criterion1": "1. Mayor puntuación",
+      "criterion2": "2. Mayor número de partidas ganadas",
+      "criterion3": "3. Mayor número de juegos ganados"
+    },
+    "group": "Grupo {{group}}",
+    "groupTitle": "Clasificación - Grupo {{group}}",
+    "noPlayers": "No hay jugadores en este grupo",
+    "addPlayersHint": "Agrega jugadores desde el panel de administración"
+  },
+  "login": {
+    "title": "Acceso Administrativo",
+    "subtitle": "Ingresa la contraseña para administrar la liga",
+    "password": "Contraseña",
+    "error": "Contraseña incorrecta",
+    "submit": "Entrar",
+    "footer1": "Solo administradores autorizados pueden acceder",
+    "footer2": "¿Problemas para acceder? Contacta al administrador"
+  }
+}

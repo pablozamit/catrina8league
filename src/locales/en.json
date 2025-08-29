@@ -1,0 +1,68 @@
+{
+  "header": {
+    "nav": {
+      "home": "Home",
+      "calendar": "Calendar",
+      "standings": "Standings",
+      "admin": "Admin"
+    },
+    "logout": "Logout",
+    "login": "Login"
+  },
+  "loading": "Loading...",
+  "home": {
+    "title": "8 Ball League La Catrina 2025"
+  },
+  "calendar": {
+    "title": "Match Schedule",
+    "description": "Check the matchups scheduled for each week",
+    "status": {
+      "finished": "Finished",
+      "scheduled": "Scheduled"
+    },
+    "noDate": "Date to be determined",
+    "location": "Billiard Table",
+    "winner": "Winner:",
+    "week": "Week {{week}}",
+    "scheduledMatches": "{{count}} scheduled matches",
+    "group": "Group {{group}}",
+    "matches": "{{count}} matches",
+    "noMatches": "No matches scheduled",
+    "noMatchesForWeek": "No matches found for week {{week}}"
+  },
+  "standings": {
+    "title": "Standings",
+    "description": "Check the positions and statistics for each group",
+    "stats": {
+      "matches": "Matches",
+      "won": "Won",
+      "lost": "Lost",
+      "gamesWon": "Games Won",
+      "gamesLost": "Games Lost",
+      "winPercentage": "Win %"
+    },
+    "legend": {
+      "title": "Legend",
+      "scoring": "Scoring System:",
+      "victory": "Win: 3 points",
+      "defeat": "Loss: 0 points",
+      "tieBreak": "Tie-break Criteria:",
+      "criterion1": "1. Highest points",
+      "criterion2": "2. Most matches won",
+      "criterion3": "3. Most games won"
+    },
+    "group": "Group {{group}}",
+    "groupTitle": "Standings - Group {{group}}",
+    "noPlayers": "No players in this group",
+    "addPlayersHint": "Add players from the admin panel"
+  },
+  "login": {
+    "title": "Administrative Access",
+    "subtitle": "Enter the password to manage the league",
+    "password": "Password",
+    "error": "Incorrect password",
+    "submit": "Enter",
+    "footer1": "Only authorized administrators may access",
+    "footer2": "Problems accessing? Contact the administrator"
+  }
+}

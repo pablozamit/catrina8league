@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const Login: React.FC = () => {
   const { isAuthenticated, login } = useAuth();
@@ -10,6 +11,7 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   if (isAuthenticated) {
     return <Navigate to="/admin" replace />;
@@ -22,7 +24,7 @@ const Login: React.FC = () => {
     if (success) {
       navigate('/admin');
     } else {
-      setError('Contraseña incorrecta');
+      setError(t('login.error'));
     }
   };
 
@@ -49,10 +51,10 @@ const Login: React.FC = () => {
             <Lock className="w-10 h-10 text-white" />
           </motion.div>
           <h2 className="text-3xl font-bold text-purple-400 mb-2">
-            Acceso Administrativo
+            {t('login.title')}
           </h2>
           <p className="text-gray-400">
-            Ingresa la contraseña para administrar la liga
+            {t('login.subtitle')}
           </p>
         </div>
 
@@ -65,7 +67,7 @@ const Login: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Contraseña
+                {t('login.password')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -104,7 +106,7 @@ const Login: React.FC = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              Entrar
+              {t('login.submit')}
             </motion.button>
           </form>
         </motion.div>
@@ -115,8 +117,8 @@ const Login: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <p>Solo administradores autorizados pueden acceder</p>
-          <p className="mt-2">¿Problemas para acceder? Contacta al administrador</p>
+          <p>{t('login.footer1')}</p>
+          <p className="mt-2">{t('login.footer2')}</p>
         </motion.div>
       </motion.div>
     </div>

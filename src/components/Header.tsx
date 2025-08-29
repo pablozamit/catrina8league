@@ -3,20 +3,22 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home, Calendar, Trophy, Settings, LogIn, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     logout();
   };
 
   const navigation = [
-    { name: 'Inicio', path: '/', icon: Home },
-    { name: 'Calendario', path: '/calendario', icon: Calendar },
-    { name: 'Clasificaciones', path: '/clasificaciones', icon: Trophy },
+    { name: t('header.nav.home'), path: '/', icon: Home },
+    { name: t('header.nav.calendar'), path: '/calendario', icon: Calendar },
+    { name: t('header.nav.standings'), path: '/clasificaciones', icon: Trophy },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -73,14 +75,14 @@ const Header: React.FC = () => {
                   }`}
                 >
                   <Settings size={18} />
-                  <span className="font-medium">Admin</span>
+                  <span className="font-medium">{t('header.nav.admin')}</span>
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-2 px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-all duration-300"
                 >
                   <LogOut size={18} />
-                  <span>Salir</span>
+                  <span>{t('header.logout')}</span>
                 </button>
               </div>
             ) : (
@@ -89,7 +91,7 @@ const Header: React.FC = () => {
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-all duration-300"
               >
                 <LogIn size={18} />
-                <span>Entrar</span>
+                <span>{t('header.login')}</span>
               </Link>
             )}
           </div>
@@ -139,7 +141,7 @@ const Header: React.FC = () => {
                     className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:text-green-400 hover:bg-green-600/10 transition-all duration-300"
                   >
                     <Settings size={18} />
-                    <span className="font-medium">Admin</span>
+                    <span className="font-medium">{t('header.nav.admin')}</span>
                   </Link>
                   <button
                     onClick={() => {
@@ -149,7 +151,7 @@ const Header: React.FC = () => {
                     className="flex items-center space-x-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-600/10 transition-all duration-300 w-full text-left"
                   >
                     <LogOut size={18} />
-                    <span>Salir</span>
+                    <span>{t('header.logout')}</span>
                   </button>
                 </>
               ) : (
@@ -159,7 +161,7 @@ const Header: React.FC = () => {
                   className="flex items-center space-x-3 px-4 py-3 rounded-lg text-blue-400 hover:bg-blue-600/10 transition-all duration-300"
                 >
                   <LogIn size={18} />
-                  <span>Entrar</span>
+                  <span>{t('header.login')}</span>
                 </Link>
               )}
             </nav>

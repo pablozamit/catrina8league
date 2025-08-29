@@ -1,0 +1,68 @@
+{
+  "header": {
+    "nav": {
+      "home": "Domus",
+      "calendar": "Calendarium",
+      "standings": "Classificatio",
+      "admin": "Admin"
+    },
+    "logout": "Exire",
+    "login": "Intrare"
+  },
+  "loading": "Onerans...",
+  "home": {
+    "title": "8 Ball Liga La Catrina 2025"
+  },
+  "calendar": {
+    "title": "Calendarium Certaminum",
+    "description": "Consule certamina cuiusque hebdomadae",
+    "status": {
+      "finished": "Perfectum",
+      "scheduled": "Programatum"
+    },
+    "noDate": "Dies definiendus",
+    "location": "Mensa Biliardi",
+    "winner": "Victor:",
+    "week": "Hebdomas {{week}}",
+    "scheduledMatches": "{{count}} certamina programmata",
+    "group": "Grex {{group}}",
+    "matches": "{{count}} certamina",
+    "noMatches": "Nulla certamina programmata",
+    "noMatchesForWeek": "Nulla certamina inventa pro hebdomade {{week}}"
+  },
+  "standings": {
+    "title": "Classificatio",
+    "description": "Consule ordines et statistica cuiusque coetus",
+    "stats": {
+      "matches": "Ludi",
+      "won": "Victi",
+      "lost": "Amissi",
+      "gamesWon": "Ludi Victi",
+      "gamesLost": "Ludi Amissi",
+      "winPercentage": "% Victoriae"
+    },
+    "legend": {
+      "title": "Legenda",
+      "scoring": "Ratio Punctationis:",
+      "victory": "Victoria: 3 puncta",
+      "defeat": "Clades: 0 puncta",
+      "tieBreak": "Criteria Separationis:",
+      "criterion1": "1. Plurima puncta",
+      "criterion2": "2. Plures ludi victi",
+      "criterion3": "3. Plures partes victae"
+    },
+    "group": "Grex {{group}}",
+    "groupTitle": "Classificatio - Grex {{group}}",
+    "noPlayers": "Nulli lusores in hoc grege",
+    "addPlayersHint": "Lusores adde e tabula administrationis"
+  },
+  "login": {
+    "title": "Accessus Administrativus",
+    "subtitle": "Scribe tessera ad ligam administrandam",
+    "password": "Tessera",
+    "error": "Tessera falsa",
+    "submit": "Intrare",
+    "footer1": "Solum administratores auctoritate accedere possunt",
+    "footer2": "Difficultates aditum? Administatori contactum fac"
+  }
+}

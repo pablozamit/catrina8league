@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const LoadingSpinner: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center justify-center min-h-[50vh]">
       <div className="text-center">
@@ -16,7 +18,7 @@ const LoadingSpinner: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
         >
-          Cargando...
+          {t('loading')}
         </motion.p>
       </div>
     </div>
