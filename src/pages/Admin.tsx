@@ -17,14 +17,12 @@ const Admin: React.FC = () => {
   // Estados para formularios
   const [playerForm, setPlayerForm] = useState({
     nombre: '',
-    apellidos: '',
-    contacto: '',
-    grupo: ''
+    grupo: '',
+    esNovato: false
   });
 
   const [groupForm, setGroupForm] = useState({
-    nombre: '',
-    descripcion: ''
+    nombre: ''
   });
 
   useEffect(() => {
@@ -52,11 +50,11 @@ const Admin: React.FC = () => {
     try {
       const playerData = {
         ...playerForm,
-        partidosJugados: 0,
-        partidosGanados: 0,
-        partidosPerdidos: 0,
-        setsGanados: 0,
-        setsPerdidos: 0,
+        partidasJugadas: 0,
+        partidasGanadas: 0,
+        partidasPerdidas: 0,
+        juegosGanados: 0,
+        juegosPerdidos: 0,
         puntos: 0
       };
 
@@ -66,7 +64,7 @@ const Admin: React.FC = () => {
         await playersService.add(playerData);
       }
 
-      setPlayerForm({ nombre: '', apellidos: '', contacto: '', grupo: '' });
+      setPlayerForm({ nombre: '', grupo: '', esNovato: false });
       setEditingPlayer(null);
       setShowPlayerForm(false);
       loadData();
@@ -78,13 +76,19 @@ const Admin: React.FC = () => {
   const handleGroupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const groupData = {
+        nombre: groupForm.nombre,
+        numeroDeJugadores: 8,
+        jugadoresQueClasifican: 4
+      };
+
       if (editingGroup) {
-        await groupsService.update(editingGroup.id!, groupForm);
+        await groupsService.update(editingGroup.id!, groupData);
       } else {
-        await groupsService.add(groupForm);
+        await groupsService.add(groupData);
       }
 
-      setGroupForm({ nombre: '', descripcion: '' });
+      setGroupForm({ nombre: '' });
       setEditingGroup(null);
       setShowGroupForm(false);
       loadData();
@@ -96,9 +100,8 @@ const Admin: React.FC = () => {
   const handleEditPlayer = (player: Player) => {
     setPlayerForm({
       nombre: player.nombre,
-      apellidos: player.apellidos,
-      contacto: player.contacto,
-      grupo: player.grupo
+      grupo: player.grupo,
+      esNovato: player.esNovato
     });
     setEditingPlayer(player);
     setShowPlayerForm(true);
@@ -106,8 +109,7 @@ const Admin: React.FC = () => {
 
   const handleEditGroup = (group: Group) => {
     setGroupForm({
-      nombre: group.nombre,
-      descripcion: group.descripcion || ''
+      nombre: group.nombre
     });
     setEditingGroup(group);
     setShowGroupForm(true);
@@ -136,8 +138,8 @@ const Admin: React.FC = () => {
   };
 
   const resetForms = () => {
-    setPlayerForm({ nombre: '', apellidos: '', contacto: '', grupo: '' });
-    setGroupForm({ nombre: '', descripcion: '' });
+    setPlayerForm({ nombre: '', grupo: '', esNovato: false });
+    setGroupForm({ nombre: '' });
     setEditingPlayer(null);
     setEditingGroup(null);
     setShowPlayerForm(false);
@@ -224,9 +226,8 @@ const Admin: React.FC = () => {
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-blue-400">
-                        {player.nombre} {player.apellidos}
+                        {player.nombre}
                       </h3>
-                      <p className="text-sm text-gray-400">{player.contacto}</p>
                       <p className="text-sm text-purple-400">Grupo: {player.grupo}</p>
                     </div>
                     <div className="flex space-x-2">
@@ -245,7 +246,7 @@ const Admin: React.FC = () => {
                     </div>
                   </div>
                   <div className="text-sm text-gray-400">
-                    <p>Partidos: {player.partidosJugados} | Puntos: {player.puntos}</p>
+                    <p>Partidas: {player.partidasJugadas} | Puntos: {player.puntos}</p>
                   </div>
                 </motion.div>
               ))}
@@ -285,7 +286,6 @@ const Admin: React.FC = () => {
                       <h3 className="text-lg font-semibold text-green-400">
                         {group.nombre}
                       </h3>
-                      <p className="text-sm text-gray-400">{group.descripcion}</p>
                     </div>
                     <div className="flex space-x-2">
                       <button
@@ -347,30 +347,16 @@ const Admin: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Apellidos
-                </label>
+              <div className="flex items-center space-x-2">
                 <input
-                  type="text"
-                  value={playerForm.apellidos}
-                  onChange={(e) => setPlayerForm({ ...playerForm, apellidos: e.target.value })}
-                  className="w-full px-4 py-2 bg-gray-900/50 border border-gray-600 rounded-lg focus:border-purple-500 text-white"
-                  required
+                  type="checkbox"
+                  checked={playerForm.esNovato}
+                  onChange={(e) => setPlayerForm({ ...playerForm, esNovato: e.target.checked })}
+                  className="w-4 h-4 text-purple-600 bg-gray-900/50 border-gray-600 rounded focus:ring-purple-500"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Contacto
+                <label className="text-sm font-medium text-gray-300">
+                  ¿Es un jugador novato?
                 </label>
-                <input
-                  type="text"
-                  value={playerForm.contacto}
-                  onChange={(e) => setPlayerForm({ ...playerForm, contacto: e.target.value })}
-                  className="w-full px-4 py-2 bg-gray-900/50 border border-gray-600 rounded-lg focus:border-purple-500 text-white"
-                  required
-                />
               </div>
 
               <div>
@@ -445,18 +431,6 @@ const Admin: React.FC = () => {
                   onChange={(e) => setGroupForm({ ...groupForm, nombre: e.target.value })}
                   className="w-full px-4 py-2 bg-gray-900/50 border border-gray-600 rounded-lg focus:border-purple-500 text-white"
                   required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Descripción
-                </label>
-                <textarea
-                  value={groupForm.descripcion}
-                  onChange={(e) => setGroupForm({ ...groupForm, descripcion: e.target.value })}
-                  className="w-full px-4 py-2 bg-gray-900/50 border border-gray-600 rounded-lg focus:border-purple-500 text-white"
-                  rows={3}
                 />
               </div>
 

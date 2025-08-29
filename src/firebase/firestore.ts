@@ -16,21 +16,21 @@ import { db } from './config';
 export interface Player {
   id?: string;
   nombre: string;
-  apellidos: string;
-  contacto: string;
   grupo: string;
-  partidosJugados: number;
-  partidosGanados: number;
-  partidosPerdidos: number;
-  setsGanados: number;
-  setsPerdidos: number;
+  esNovato: boolean;
+  partidasJugadas: number;
+  partidasGanadas: number;
+  partidasPerdidas: number;
+  juegosGanados: number;
+  juegosPerdidos: number;
   puntos: number;
 }
 
 export interface Group {
   id?: string;
   nombre: string;
-  descripcion?: string;
+  numeroDeJugadores: number;
+  jugadoresQueClasifican: number;
 }
 
 export interface Match {
