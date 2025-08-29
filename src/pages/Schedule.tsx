@@ -1,19 +1,85 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-import '@n8n/chat/style.css';
-import { createChat } from '@n8n/chat';
+// --- Widget n8n legacy (script externo) ---
+declare global {
+  interface Window {
+    n8nChat?: {
+      init: (options: { chatUrl: string }) => void;
+    };
+  }
+}
+
+const N8N_HOST = 'https://n8n.srv907628.hstgr.cloud';
+const WEBHOOK_ID = '08edf318-16cd-4aa4-81a5-ea5e4013be78';
+
+// ⚠️ Para el widget externo, la URL correcta es /chat/<id> (no /webhook/.../chat)
+const CHAT_URL = `${N8N_HOST}/chat/${WEBHOOK_ID}`;
 
 const Schedule: React.FC = () => {
   useEffect(() => {
-    if ((window as any).__n8nChatMounted) return;
-    (window as any).__n8nChatMounted = true;
+    const LOG_PREFIX = '[N8N LEGACY WIDGET]';
+    console.log(`${LOG_PREFIX} Montando Schedule y cargando widget.`);
 
-    createChat({
-      webhookUrl: 'https://n8n.srv907628.hstgr.cloud/webhook/08edf318-16cd-4aa4-81a5-ea5e4013be78',
-      mode: 'window',
-      showWelcomeScreen: false,
-    });
+    // Evitar doble carga en fast-refresh
+    if ((window as any).__n8nWidgetLoaded) {
+      console.log(`${LOG_PREFIX} Ya estaba cargado, salgo.`);
+      return;
+    }
+
+    // Cargar CSS
+    const styleId = 'n8n-chat-widget-style';
+    if (!document.getElementById(styleId)) {
+      const link = document.createElement('link');
+      link.id = styleId;
+      link.rel = 'stylesheet';
+      link.href = `${N8N_HOST}/chat/widget.css`;
+      link.crossOrigin = 'anonymous';
+      link.referrerPolicy = 'no-referrer';
+      link.onerror = () => console.error(`${LOG_PREFIX} Error cargando widget.css`);
+      document.head.appendChild(link);
+    }
+
+    // Cargar JS
+    const scriptId = 'n8n-chat-widget-script';
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.src = `${N8N_HOST}/chat/widget.js`;
+      script.async = true;
+      script.crossOrigin = 'anonymous';
+      script.referrerPolicy = 'no-referrer';
+
+      script.onload = () => {
+        console.log(`${LOG_PREFIX} widget.js cargado. Inicializando…`);
+        const init = () => {
+          if (window.n8nChat && typeof window.n8nChat.init === 'function') {
+            try {
+              window.n8nChat.init({ chatUrl: CHAT_URL });
+              (window as any).__n8nWidgetLoaded = true;
+              console.log(`${LOG_PREFIX} init() OK con chatUrl=${CHAT_URL}`);
+            } catch (e) {
+              console.error(`${LOG_PREFIX} Error en init()`, e);
+            }
+          } else {
+            console.warn(`${LOG_PREFIX} window.n8nChat aún no disponible; reintento en 300ms…`);
+            setTimeout(init, 300);
+          }
+        };
+        init();
+      };
+
+      script.onerror = () => {
+        console.error(`${LOG_PREFIX} Error cargando widget.js desde ${script.src}`);
+      };
+
+      document.body.appendChild(script);
+    }
+
+    return () => {
+      // Limpieza opcional si esta página se desmonta
+      // (normalmente no necesario en SPA con botón flotante)
+    };
   }, []);
 
   return (
@@ -43,7 +109,7 @@ const Schedule: React.FC = () => {
           <h2 className="text-2xl font-bold text-purple-400 mb-4">Asistente de Partidos</h2>
           <div className="card bg-black/30 border-purple-500/30 p-6 h-full">
             <p className="text-gray-300">
-              Usa el botón de chat de la esquina inferior derecha para hablar con "El Marcador" y agendar tu partida.
+              Usa el asistente de chat que aparece en la <strong>esquina inferior derecha</strong> para hablar con "El Marcador" y agendar tu partida.
             </p>
           </div>
         </div>
