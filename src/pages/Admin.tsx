@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, Users, Settings, Save, X } from 'lucide-react';
-import { playersService, groupsService, Player, Group } from '../firebase/firestore';
+import {
+  playersService,
+  groupsService,
+  matchesService,
+  Player,
+  Group,
+  Match
+} from '../firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Admin: React.FC = () => {
@@ -137,6 +144,67 @@ const Admin: React.FC = () => {
     }
   };
 
+  const generateRoundRobin = (players: Player[], groupName: string): Omit<Match, 'id'>[] => {
+    const list = [...players];
+    const n = list.length;
+    const rounds = n - 1;
+    const matches: Omit<Match, 'id'>[] = [];
+
+    for (let round = 0; round < rounds; round++) {
+      for (let i = 0; i < n / 2; i++) {
+        const p1 = list[i];
+        const p2 = list[n - 1 - i];
+        matches.push({
+          jugador1Id: p1.id!,
+          jugador2Id: p2.id!,
+          jugador1Nombre: p1.nombre,
+          jugador2Nombre: p2.nombre,
+          grupo: groupName,
+          semana: round + 1,
+          completado: false
+        });
+      }
+      const last = list.pop();
+      if (last) {
+        list.splice(1, 0, last);
+      }
+    }
+
+    return matches;
+  };
+
+  const handleGenerateCalendar = async () => {
+    if (
+      !window.confirm(
+        'Esto eliminará los partidos existentes y generará un nuevo calendario. ¿Deseas continuar?'
+      )
+    ) {
+      return;
+    }
+    try {
+      const playersByGroup: Record<string, Player[]> = {};
+      players.forEach((player) => {
+        if (!playersByGroup[player.grupo]) {
+          playersByGroup[player.grupo] = [];
+        }
+        playersByGroup[player.grupo].push(player);
+      });
+
+      let newMatches: Omit<Match, 'id'>[] = [];
+      Object.entries(playersByGroup).forEach(([groupName, groupPlayers]) => {
+        if (groupPlayers.length === 8) {
+          newMatches = newMatches.concat(generateRoundRobin(groupPlayers, groupName));
+        }
+      });
+
+      await matchesService.replaceCalendar(newMatches);
+      alert('Calendario generado correctamente');
+    } catch (error) {
+      console.error('Error generando calendario:', error);
+      alert('Error generando calendario');
+    }
+  };
+
   const resetForms = () => {
     setPlayerForm({ nombre: '', grupo: '', esNovato: false });
     setGroupForm({ nombre: '' });
@@ -261,17 +329,31 @@ const Admin: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Botón agregar grupo */}
+            {/* Botón agregar grupo y generar calendario */}
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gold-400">Gestión de Grupos</h2>
-              <button
-                onClick={() => setShowGroupForm(true)}
-                className="btn btn-primary flex items-center space-x-2"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Agregar Grupo</span>
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setShowGroupForm(true)}
+                  className="btn btn-primary flex items-center space-x-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>Agregar Grupo</span>
+                </button>
+                <button
+                  onClick={handleGenerateCalendar}
+                  disabled={players.length !== 32 || groups.length !== 4}
+                  className="btn btn-secondary flex items-center space-x-2 disabled:opacity-50"
+                >
+                  Generar Calendario Completo
+                </button>
+              </div>
             </div>
+            {(players.length !== 32 || groups.length !== 4) && (
+              <p className="text-sm text-gray-400 mb-4">
+                Se requieren exactamente 32 jugadores y 4 grupos para generar el calendario.
+              </p>
+            )}
 
             {/* Lista de grupos */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
