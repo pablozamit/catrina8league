@@ -6,26 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Catrina 8 League</title>
 
-    <!-- n8n Chat (estilos desde CDN) -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/style.css"
-      rel="stylesheet"
-    />
-
-    <!-- n8n Chat (script desde CDN) -->
+    <!-- n8n Chat (estilos + script desde CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/style.css" rel="stylesheet" />
     <script type="module">
       import { createChat } from "https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/chat.bundle.es.js";
-
-      // Mostrar solo en la ruta /schedule
-      const onSchedule = location.pathname.toLowerCase().includes("schedule");
-      if (onSchedule) {
-        createChat({
-          webhookUrl:
-            "https://n8n.srv907628.hstgr.cloud/webhook/08edf318-16cd-4aa4-81a5-ea5e4013be78",
-          mode: "window", // botón flotante en esquina inferior derecha
-          showWelcomeScreen: false,
-        });
-      }
+      createChat({
+        webhookUrl: "https://n8n.srv907628.hstgr.cloud/webhook/08edf318-16cd-4aa4-81a5-ea5e4013be78",
+        mode: "window",             // mostrará un botón flotante abajo a la derecha
+        showWelcomeScreen: false
+      });
     </script>
   </head>
   <body>
