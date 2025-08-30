@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 
 type Message = { id: string; role: "user" | "bot"; text: string };
 
-const WEBHOOK_URL =
-  "https://n8n.srv907628.hstgr.cloud/webhook/08edf318-16cd-4aa4-81a5-ea5e4013be78";
+// Ahora usamos el proxy de Vercel para evitar CORS
+const WEBHOOK_URL = "/api/chat";
 
 const Schedule: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -52,7 +52,8 @@ const Schedule: React.FC = () => {
       }
 
       const reply =
-        (data && (data.output || data.answer || data.text || data.response || data.message)) ||
+        (data &&
+          (data.output || data.answer || data.text || data.response || data.message)) ||
         (typeof data === "string" ? data : "No entendí nada 🤔");
 
       setMessages((m) => [...m, { id: Math.random().toString(), role: "bot", text: reply }]);
@@ -110,7 +111,7 @@ const Schedule: React.FC = () => {
         </div>
       </div>
 
-      {/* Botón flotante — 8-ball grande */}
+      {/* Botón flotante — bola 8 */}
       <button
         onClick={() => setOpen(!open)}
         aria-label="Abrir chat"
@@ -118,7 +119,6 @@ const Schedule: React.FC = () => {
         className="fixed bottom-6 right-6 z-50 w-24 h-24 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.6)] flex items-center justify-center hover:scale-105 transition-transform focus:outline-none"
         style={{ background: "radial-gradient(circle at 35% 35%, #444 0%, #111 60%, #000 100%)" }}
       >
-        {/* Bola de billar 8 (SVG) */}
         <svg width="68" height="68" viewBox="0 0 100 100" aria-hidden="true">
           <circle cx="50" cy="50" r="45" fill="transparent" />
           <circle cx="50" cy="50" r="22" fill="#ffffff" />
@@ -157,7 +157,7 @@ const Schedule: React.FC = () => {
             ))}
           </div>
 
-          {/* Footer (alto contraste) */}
+          {/* Footer */}
           <div className="p-3 border-t border-purple-500/40 bg-gray-900 flex gap-2">
             <input
               value={input}
