@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 type Message = { id: string; role: "user" | "bot"; text: string };
 
-// SIEMPRE usamos el proxy local (evita CORS)
+// Siempre hablar con el proxy local (evita CORS)
 const WEBHOOK_URL = "/api/chat";
 
 const Schedule: React.FC = () => {
@@ -39,13 +39,12 @@ const Schedule: React.FC = () => {
     setSending(true);
 
     try {
-      // Debug útil: debe imprimir /api/chat, no un dominio externo
       console.info("Enviando a:", WEBHOOK_URL);
-
+      // Enviamos con los keys por defecto; el proxy acepta ambos formatos
       const res = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chatId, message: text }),
+        body: JSON.stringify({ sessionId: chatId, chatInput: text }),
       });
 
       const isJson = (res.headers.get("content-type") || "").includes("application/json");
@@ -161,7 +160,7 @@ const Schedule: React.FC = () => {
             ))}
           </div>
 
-          {/* Footer (alto contraste) */}
+          {/* Footer */}
           <div className="p-3 border-t border-purple-500/40 bg-gray-900 flex gap-2">
             <input
               value={input}
