@@ -2,13 +2,12 @@ export default async function handler(req, res) {
   const N8N_WEBHOOK =
     "https://n8n.srv907628.hstgr.cloud/webhook/08edf318-16cd-4aa4-81a5-ea5e4013be78";
 
-  // Log inicial
   console.log("[API/CHAT] Nueva petición:", {
     method: req.method,
     body: req.body,
   });
 
-  // Preflight CORS
+  // CORS para tu frontend
   res.setHeader("Access-Control-Allow-Origin", "https://catrina8league.vercel.app");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -24,7 +23,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Reenvío a n8n
     const upstream = await fetch(N8N_WEBHOOK, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -36,7 +34,7 @@ export default async function handler(req, res) {
     console.log("[API/CHAT] Respuesta de n8n:", {
       status: upstream.status,
       length: text.length,
-      preview: text.slice(0, 200), // solo un trozo para no saturar logs
+      preview: text.slice(0, 200),
     });
 
     res.status(upstream.status).send(text);
