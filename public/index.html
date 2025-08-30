@@ -6,21 +6,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Catrina 8 League</title>
 
-    <!-- n8n Chat (estilos + script global) -->
+    <!-- Estilos del chat -->
     <link href="https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/style.css" rel="stylesheet" />
+
+    <style>
+      /* Pequeña banda de depuración para ver qué pasa sin abrir consola */
+      #n8n-chat-debug {
+        position: fixed; z-index: 999999; right: 8px; bottom: 8px;
+        background: rgba(0,0,0,.7); color: #0ff; font: 12px/1.4 monospace;
+        padding: 6px 8px; border: 1px solid #0ff; border-radius: 6px;
+        max-width: 40vw; pointer-events: none;
+      }
+    </style>
+
+    <!-- Script UMD global del chat -->
     <script src="https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/chat.bundle.umd.js"></script>
+
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        if (window.n8nChat) {
-          window.n8nChat.init({
-            webhookUrl: "https://n8n.srv907628.hstgr.cloud/webhook/08edf318-16cd-4aa4-81a5-ea5e4013be78",
-            mode: "window",
-            showWelcomeScreen: false,
-          });
-        } else {
-          console.error("n8nChat no cargó correctamente");
+      (function () {
+        // 💡 Cambia aquí tu host e ID si hiciera falta
+        const N8N_HOST = "https://n8n.srv907628.hstgr.cloud";
+        const WEBHOOK_ID = "08edf318-16cd-4aa4-81a5-ea5e4013be78";
+
+        // URLs posibles que aceptan distintos builds
+        const webhookUrl = `${N8N_HOST}/webhook/${WEBHOOK_ID}`;
+        const chatUrl    = `${N8N_HOST}/chat/${WEBHOOK_ID}`;
+
+        // Debug overlay
+        function dbg(msg) {
+          let el = document.getElementById("n8n-chat-debug");
+          if (!el) {
+            el = document.createElement("div");
+            el.id = "n8n-chat-debug";
+            document.body.appendChild(el);
+          }
+          el.textContent = String(msg);
         }
-      });
+
+        function tryInit() {
+          try {
+            if (!window.n8nChat) {
+              dbg("n8nChat NO cargado todavía.");
+              return setTimeout(tryInit, 300);
+            }
+
+            // Hay builds que exponen createChat, otros init:
+            const hasCreate = typeof window.n8nChat.createChat === "function";
+            const hasInit   = typeof window.n8nChat.init       === "function";
+
+            if (!hasCreate && !hasInit) {
+              dbg("n8nChat cargado pero sin createChat/init. Reintentando…");
+              return setTimeout(tryInit, 300);
+            }
+
+            // Intento 1: API moderna (createChat) con webhookUrl
+            try {
+              if (hasCreate) {
+                window.n8nChat.createChat({
+                  webhookUrl,
+                  mode: "window",
+                  showWelcomeScreen: false,
+                });
+                dbg("✅ createChat(webhookUrl) OK");
+                return;
+              }
+            } catch (e) {
+              // sigue
+            }
+
+            // Intento 2: API moderna (createChat) con chatUrl
+            try {
+              if (hasCreate) {
+                window.n8nChat.createChat({
+                  chatUrl,
+                  mode: "window",
+                  showWelcomeScreen: false,
+                });
+                dbg("✅ createChat(chatUrl) OK");
+                return;
+              }
+            } catch (e) {
+              // sigue
+            }
+
+            // Intento 3: API legacy (init) con webhookUrl
+            try {
+              if (hasInit) {
+                window.n8nChat.init({
+                  webhookUrl,
+                  mode: "window",
+                  showWelcomeScreen: false,
+                });
+                dbg("✅ init(webhookUrl) OK");
+                return;
+              }
+            } catch (e) {
+              // sigue
+            }
+
+            // Intento 4: API legacy (init) con chatUrl
+            try {
+              if (hasInit) {
+                window.n8nChat.init({
+                  chatUrl,
+                  mode: "window",
+                  showWelcomeScreen: false,
+                });
+                dbg("✅ init(chatUrl) OK");
+                return;
+              }
+            } catch (e) {
+              // sigue
+            }
+
+            dbg("❌ No se pudo inicializar (probar otras URLs o revisar CORS del host).");
+          } catch (err) {
+            dbg("❌ Excepción al iniciar: " + (err && err.message ? err.message : err));
+          }
+        }
+
+        // Arrancar cuando el DOM está listo
+        document.addEventListener("DOMContentLoaded", tryInit);
+      })();
     </script>
   </head>
   <body>
