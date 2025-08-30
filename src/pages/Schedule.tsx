@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { N8nChat } from '@n8n/chat';
+import { N8nChat } from '@n8n/chat'; // Se importa el componente oficial
 
 const Schedule: React.FC = () => {
   return (
