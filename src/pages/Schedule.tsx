@@ -11,7 +11,7 @@ const Schedule: React.FC = () => {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { id: "welcome", role: "bot", text: "👋 Soy El Marcador, dime cuándo quieres jugar." },
+    { id: "welcome", role: "bot", text: "Programa tu partida aquí" },
   ]);
 
   const chatId = useMemo(() => {
@@ -52,14 +52,18 @@ const Schedule: React.FC = () => {
       }
 
       const reply =
-        (data && (data.output || data.answer || data.text || data.response)) ||
+        (data && (data.output || data.answer || data.text || data.response || data.message)) ||
         (typeof data === "string" ? data : "No entendí nada 🤔");
 
       setMessages((m) => [...m, { id: Math.random().toString(), role: "bot", text: reply }]);
     } catch (err: any) {
       setMessages((m) => [
         ...m,
-        { id: Math.random().toString(), role: "bot", text: "❌ Error al conectar con el asistente." },
+        {
+          id: Math.random().toString(),
+          role: "bot",
+          text: "❌ Error al conectar con el asistente. Revisa conexión o inténtalo de nuevo.",
+        },
       ]);
     } finally {
       setSending(false);
@@ -98,28 +102,41 @@ const Schedule: React.FC = () => {
         <div className="flex-1 lg:w-1/3 relative">
           <h2 className="text-2xl font-bold text-purple-400 mb-4">Asistente de Partidos</h2>
           <div className="card bg-black/30 border-purple-500/30 p-6 h-full">
-            <p className="text-gray-300">
-              Usa el botón de chat abajo a la derecha para hablar con "El Marcador".
+            <p className="text-gray-200">
+              Usa el botón de chat abajo a la derecha para hablar con <span className="font-semibold">“No molestéis a Pablo”</span>.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Botón flotante */}
+      {/* Botón flotante — 8-ball grande */}
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-purple-600 hover:bg-purple-500 rounded-full shadow-xl text-white text-2xl flex items-center justify-center z-50"
+        aria-label="Abrir chat"
+        title="Abrir chat"
+        className="fixed bottom-6 right-6 z-50 w-24 h-24 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.6)] flex items-center justify-center
+                   hover:scale-105 transition-transform focus:outline-none"
+        style={{ background: "radial-gradient(circle at 35% 35%, #444 0%, #111 60%, #000 100%)" }}
       >
-        💬
+        {/* Bola de billar 8 (SVG) */}
+        <svg width="68" height="68" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" fill="transparent" />
+          <circle cx="50" cy="50" r="22" fill="#ffffff" />
+          <text x="50" y="57" textAnchor="middle" fontSize="28" fontWeight="700" fill="#000">
+            8
+          </text>
+        </svg>
       </button>
 
       {/* Ventana de chat */}
       {open && (
-        <div className="fixed bottom-24 right-6 w-80 h-[480px] bg-gray-900 text-white rounded-2xl shadow-2xl border border-purple-500/40 flex flex-col overflow-hidden z-50">
+        <div className="fixed bottom-32 right-6 z-50 w-[360px] h-[520px] rounded-2xl shadow-2xl border border-purple-500/50
+                        bg-gradient-to-b from-gray-900 to-black text-white flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="bg-purple-600 px-4 py-3 flex items-center justify-between">
-            <span className="font-semibold">El Marcador</span>
-            <button onClick={() => setOpen(false)}>✖</button>
+          <div className="px-4 py-3 flex items-center justify-between"
+               style={{ background: "linear-gradient(90deg, rgba(124,58,237,0.9), rgba(59,130,246,0.9))" }}>
+            <span className="font-semibold">No molestéis a Pablo</span>
+            <button onClick={() => setOpen(false)} className="text-white/90 hover:text-white">✖</button>
           </div>
 
           {/* Body */}
@@ -127,39 +144,29 @@ const Schedule: React.FC = () => {
             {messages.map((m) => (
               <div
                 key={m.id}
-                className={`max-w-[75%] px-3 py-2 rounded-lg text-sm whitespace-pre-wrap ${
-                  m.role === "user"
-                    ? "ml-auto bg-gray-200 text-gray-900"
-                    : "mr-auto bg-purple-600 text-white"
-                }`}
+                className={`max-w-[80%] px-3 py-2 rounded-lg text-sm leading-relaxed whitespace-pre-wrap break-words
+                  ${m.role === "user"
+                    ? "ml-auto bg-gray-100 text-gray-900"
+                    : "mr-auto bg-purple-600 text-white"}
+                `}
               >
                 {m.text}
               </div>
             ))}
           </div>
 
-          {/* Footer */}
-          <div className="p-3 border-t border-gray-700 flex gap-2">
+          {/* Footer (alto contraste) */}
+          <div className="p-3 border-t border-purple-500/40 bg-gray-900 flex gap-2">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
               disabled={sending}
               placeholder={sending ? "Enviando..." : "Escribe tu mensaje"}
-              className="flex-1 rounded-lg px-3 py-2 text-gray-900"
+              className="flex-1 rounded-lg px-3 py-2 bg-gray-800 text-white placeholder-gray-400 caret-white
+                         outline-none focus:ring-2 focus:ring-purple-400"
             />
             <button
               onClick={sendMessage}
               disabled={sending}
-              className="bg-purple-600 hover:bg-purple-500 text-white rounded-lg px-3 py-2"
-            >
-              ➤
-            </button>
-          </div>
-        </div>
-      )}
-    </motion.div>
-  );
-};
-
-export default Schedule;
+              className="rounded-lg px-4 py-2 font-semibold text-white shadow
