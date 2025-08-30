@@ -6,14 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Catrina 8 League</title>
 
-    <!-- n8n Chat (estilos + script desde CDN) -->
+    <!-- n8n Chat (estilos + script global) -->
     <link href="https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/style.css" rel="stylesheet" />
-    <script type="module">
-      import { createChat } from "https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/chat.bundle.es.js";
-      createChat({
-        webhookUrl: "https://n8n.srv907628.hstgr.cloud/webhook/08edf318-16cd-4aa4-81a5-ea5e4013be78",
-        mode: "window",
-        showWelcomeScreen: false
+    <script src="https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/chat.bundle.umd.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (window.n8nChat) {
+          window.n8nChat.init({
+            webhookUrl: "https://n8n.srv907628.hstgr.cloud/webhook/08edf318-16cd-4aa4-81a5-ea5e4013be78",
+            mode: "window",
+            showWelcomeScreen: false,
+          });
+        } else {
+          console.error("n8nChat no cargó correctamente");
+        }
       });
     </script>
   </head>
