@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 type Message = { id: string; role: "user" | "bot"; text: string };
 
-// Ahora usamos el proxy de Vercel para evitar CORS
+// 👉 Llamamos siempre al proxy en Vercel
 const WEBHOOK_URL = "/api/chat";
 
 const Schedule: React.FC = () => {
@@ -38,6 +38,7 @@ const Schedule: React.FC = () => {
     setSending(true);
 
     try {
+      console.info("Enviando a:", WEBHOOK_URL); // Debug
       const res = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
