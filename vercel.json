@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/chat",
+      "destination": "https://n8n.srv907628.hstgr.cloud/webhook/08edf318-16cd-4aa4-81a5-ea5e4013be78"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
