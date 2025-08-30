@@ -6,61 +6,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Catrina 8 League</title>
 
-    <!-- n8n Chat (estilos + script UMD global) -->
+    <!-- n8n Chat (estilos + script UMD) -->
     <link href="https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/style.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/chat.bundle.umd.js"></script>
 
+    <!-- Pequeño indicador para comprobar que este script se ejecuta -->
     <style>
       #n8n-chat-debug{
-        position:fixed;right:8px;bottom:8px;z-index:999999;
-        background:rgba(0,0,0,.75);color:#0ff;font:12px/1.4 monospace;
-        padding:6px 8px;border:1px solid #0ff;border-radius:6px;pointer-events:none
+        position:fixed;right:8px;bottom:8px;z-index:999999;background:rgba(0,0,0,.75);
+        color:#0ff;font:12px/1.4 monospace;padding:6px 8px;border:1px solid #0ff;border-radius:6px
       }
     </style>
     <script>
-      // Debug visible para confirmar que el script corre
-      function dbg(msg){
-        let el=document.getElementById('n8n-chat-debug');
-        if(!el){ el=document.createElement('div'); el.id='n8n-chat-debug'; document.addEventListener('DOMContentLoaded',()=>document.body.appendChild(el)); }
-        el.textContent=String(msg);
-      }
-
       const N8N_HOST = "https://n8n.srv907628.hstgr.cloud";
       const WEBHOOK_ID = "08edf318-16cd-4aa4-81a5-ea5e4013be78";
       const webhookUrl = `${N8N_HOST}/webhook/${WEBHOOK_ID}`;
       const chatUrl    = `${N8N_HOST}/chat/${WEBHOOK_ID}`;
 
-      function tryInit(){
-        if(!window.n8nChat){ dbg('n8nChat aún no cargado…'); return setTimeout(tryInit,300); }
-        try{
-          if (typeof window.n8nChat.createChat === 'function'){
-            window.n8nChat.createChat({ webhookUrl, mode:'window', showWelcomeScreen:false });
-            dbg('✅ createChat(webhookUrl) OK');
-          } else if (typeof window.n8nChat.init === 'function'){
-            window.n8nChat.init({ webhookUrl, mode:'window', showWelcomeScreen:false });
-            dbg('✅ init(webhookUrl) OK');
-          } else {
-            dbg('❌ n8nChat sin API usable');
-          }
-        }catch(e){
-          // fallback con chatUrl por si tu build lo requiere
-          try{
-            if (typeof window.n8nChat.createChat === 'function'){
-              window.n8nChat.createChat({ chatUrl, mode:'window', showWelcomeScreen:false });
-              dbg('✅ createChat(chatUrl) OK');
-            } else if (typeof window.n8nChat.init === 'function'){
-              window.n8nChat.init({ chatUrl, mode:'window', showWelcomeScreen:false });
-              dbg('✅ init(chatUrl) OK');
-            } else {
-              dbg('❌ fallo al inicializar: ' + (e?.message||e));
-            }
-          }catch(e2){
-            dbg('❌ excepción: ' + (e2?.message||e2));
-          }
-        }
+      function dbg(msg){
+        let el=document.getElementById('n8n-chat-debug');
+        if(!el){ el=document.createElement('div'); el.id='n8n-chat-debug'; document.body.appendChild(el); }
+        el.textContent=String(msg);
       }
 
-      document.addEventListener('DOMContentLoaded', tryInit);
+      function initN8N(){
+        if(!window.n8nChat){ dbg("n8nChat aún no cargado..."); return setTimeout(initN8N,300); }
+        try{
+          if(typeof window.n8nChat.createChat==="function"){
+            window.n8nChat.createChat({ webhookUrl, mode:"window", showWelcomeScreen:false });
+            dbg("✅ createChat(webhookUrl) OK");
+            return;
+          }
+          if(typeof window.n8nChat.init==="function"){
+            window.n8nChat.init({ webhookUrl, mode:"window", showWelcomeScreen:false });
+            dbg("✅ init(webhookUrl) OK");
+            return;
+          }
+        }catch(e){}
+        try{
+          if(typeof window.n8nChat.createChat==="function"){
+            window.n8nChat.createChat({ chatUrl, mode:"window", showWelcomeScreen:false });
+            dbg("✅ createChat(chatUrl) OK");
+            return;
+          }
+          if(typeof window.n8nChat.init==="function"){
+            window.n8nChat.init({ chatUrl, mode:"window", showWelcomeScreen:false });
+            dbg("✅ init(chatUrl) OK");
+            return;
+          }
+        }catch(e2){ dbg("❌ Error: "+(e2?.message||e2)); }
+      }
+
+      document.addEventListener("DOMContentLoaded", initN8N);
     </script>
   </head>
   <body>
