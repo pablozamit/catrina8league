@@ -1,9 +1,10 @@
+// src/pages/Schedule.tsx
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 
 type Message = { id: string; role: "user" | "bot"; text: string };
 
-// 👉 Llamamos siempre al proxy en Vercel
+// SIEMPRE usamos el proxy local (evita CORS)
 const WEBHOOK_URL = "/api/chat";
 
 const Schedule: React.FC = () => {
@@ -38,34 +39,36 @@ const Schedule: React.FC = () => {
     setSending(true);
 
     try {
-      console.info("Enviando a:", WEBHOOK_URL); // Debug
+      // Debug útil: debe imprimir /api/chat, no un dominio externo
+      console.info("Enviando a:", WEBHOOK_URL);
+
       const res = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chatId, message: text }),
       });
 
-      let data: any = null;
-      try {
-        data = await res.json();
-      } catch {
-        data = await res.text();
+      const isJson = (res.headers.get("content-type") || "").includes("application/json");
+      const payload = isJson ? await res.json() : await res.text();
+
+      if (!res.ok) {
+        const errText = typeof payload === "string" ? payload : JSON.stringify(payload);
+        setMessages((m) => [
+          ...m,
+          { id: Math.random().toString(), role: "bot", text: `❌ Error ${res.status}: ${errText}` },
+        ]);
+      } else {
+        const reply =
+          (payload &&
+            (payload.output || payload.answer || payload.text || payload.response || payload.message)) ||
+          (typeof payload === "string" ? payload : "No entendí nada 🤔");
+
+        setMessages((m) => [...m, { id: Math.random().toString(), role: "bot", text: reply }]);
       }
-
-      const reply =
-        (data &&
-          (data.output || data.answer || data.text || data.response || data.message)) ||
-        (typeof data === "string" ? data : "No entendí nada 🤔");
-
-      setMessages((m) => [...m, { id: Math.random().toString(), role: "bot", text: reply }]);
     } catch (err: any) {
       setMessages((m) => [
         ...m,
-        {
-          id: Math.random().toString(),
-          role: "bot",
-          text: "❌ Error al conectar con el asistente. Revisa conexión o inténtalo de nuevo.",
-        },
+        { id: Math.random().toString(), role: "bot", text: `❌ Error de red: ${String(err?.message || err)}` },
       ]);
     } finally {
       setSending(false);
@@ -112,7 +115,7 @@ const Schedule: React.FC = () => {
         </div>
       </div>
 
-      {/* Botón flotante — bola 8 */}
+      {/* Botón flotante — bola 8 grande */}
       <button
         onClick={() => setOpen(!open)}
         aria-label="Abrir chat"
@@ -158,7 +161,7 @@ const Schedule: React.FC = () => {
             ))}
           </div>
 
-          {/* Footer */}
+          {/* Footer (alto contraste) */}
           <div className="p-3 border-t border-purple-500/40 bg-gray-900 flex gap-2">
             <input
               value={input}
