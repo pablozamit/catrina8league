@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 
 type Message = { id: string; role: "user" | "bot"; text: string };
 
-// Siempre hablar con el proxy local (evita CORS)
 const WEBHOOK_URL = "/api/chat";
 
 const Schedule: React.FC = () => {
@@ -40,15 +39,20 @@ const Schedule: React.FC = () => {
 
     try {
       console.info("Enviando a:", WEBHOOK_URL);
-      // Enviamos con los keys por defecto; el proxy acepta ambos formatos
       const res = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId: chatId, chatInput: text }),
       });
 
-      const isJson = (res.headers.get("content-type") || "").includes("application/json");
-      const payload = isJson ? await res.json() : await res.text();
+      // Leemos como texto y luego intentamos parsear (por si el header no es JSON)
+      const raw = await res.text();
+      let payload: any;
+      try {
+        payload = JSON.parse(raw);
+      } catch {
+        payload = { output: raw };
+      }
 
       if (!res.ok) {
         const errText = typeof payload === "string" ? payload : JSON.stringify(payload);
@@ -58,11 +62,14 @@ const Schedule: React.FC = () => {
         ]);
       } else {
         const reply =
-          (payload &&
-            (payload.output || payload.answer || payload.text || payload.response || payload.message)) ||
-          (typeof payload === "string" ? payload : "No entendí nada 🤔");
+          payload.output ||
+          payload.answer ||
+          payload.text ||
+          payload.response ||
+          payload.message ||
+          (typeof payload === "string" ? payload : "");
 
-        setMessages((m) => [...m, { id: Math.random().toString(), role: "bot", text: reply }]);
+        setMessages((m) => [...m, { id: Math.random().toString(), role: "bot", text: reply || "No entendí nada 🤔" }]);
       }
     } catch (err: any) {
       setMessages((m) => [
@@ -114,7 +121,7 @@ const Schedule: React.FC = () => {
         </div>
       </div>
 
-      {/* Botón flotante — bola 8 grande */}
+      {/* Botón flotante — bola 8 */}
       <button
         onClick={() => setOpen(!open)}
         aria-label="Abrir chat"
