@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@n8n/chat": "^1.1.0",
     "firebase": "^10.7.1",
     "framer-motion": "^10.16.16",
     "i18next": "^25.4.2",
