@@ -192,6 +192,18 @@ a:hover {
   transform: translateY(-2px);
 }
 
+.btn-danger {
+  color: var(--neon-red);
+  border-color: var(--neon-red);
+}
+
+.btn-danger:hover {
+  background: var(--neon-red);
+  color: var(--bg-primary);
+  box-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red), 0 0 30px var(--neon-red);
+  transform: translateY(-2px);
+}
+
 /* Inputs */
 input, textarea, select {
   font-family: var(--font-body);

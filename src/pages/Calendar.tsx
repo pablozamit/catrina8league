@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Users } from 'lucide-react';
 import { matchesService, Match } from '../firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useTranslation } from 'react-i18next';
@@ -48,31 +48,6 @@ const Calendar: React.FC = () => {
       grouped[match.grupo].push(match);
     });
     return grouped;
-  };
-
-  const getLocale = () => {
-    if (i18n.language === 'es') return 'es-ES';
-    return 'en-US';
-  };
-
-  const formatDate = (timestamp: any) => {
-    if (!timestamp) return t('calendar.noDate');
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString(getLocale(), {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const formatTime = (timestamp: any) => {
-    if (!timestamp) return '20:00';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleTimeString(getLocale(), {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   const getMaxWeek = () => {
@@ -204,92 +179,24 @@ const Calendar: React.FC = () => {
                   {groupMatches.map((match, matchIndex) => (
                     <motion.div
                       key={match.id}
-                      className={`card bg-gradient-to-br ${
-                        match.completado
-                          ? 'from-green-900/20 to-blue-900/20 border-green-500/30'
-                          : 'from-blue-900/20 to-purple-900/20 border-blue-500/30'
-                      }`}
+                      className="card bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-blue-500/30"
                       whileHover={{ scale: 1.02, y: -4 }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: 0.05 * matchIndex }}
                     >
-                      {/* Estado del partido */}
-                      <div className="flex justify-between items-start mb-4">
-                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                          match.completado
-                            ? 'bg-green-600/20 text-green-400 border border-green-500/30'
-                            : 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
-                        }`}>
-                        {match.completado ? t('calendar.status.finished') : t('calendar.status.scheduled')}
-                        </span>
-                        <div className="flex items-center space-x-1 text-xs text-gray-400">
-                          <Clock className="w-3 h-3" />
-                          <span>{formatTime(match.fecha)}</span>
-                        </div>
-                      </div>
-
                       {/* Jugadores */}
-                      <div className="space-y-3 mb-4">
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-blue-400">
-                            {match.jugador1Nombre}
-                          </span>
-                          {match.resultado && (
-                            <span className={`text-lg font-bold ${
-                              match.resultado.ganadorId === match.jugador1Id
-                                ? 'text-green-400'
-                                : 'text-gray-400'
-                            }`}>
-                              {match.resultado.setsJugador1}
-                            </span>
-                          )}
-                        </div>
-                        
-                        <div className="text-center text-gray-500 font-bold text-sm">
+                      <div className="flex flex-col items-center justify-center space-y-2">
+                        <span className="font-semibold text-lg text-blue-400 text-center">
+                          {match.jugador1Nombre}
+                        </span>
+                        <span className="text-center text-gray-500 font-bold text-sm">
                           VS
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-blue-400">
-                            {match.jugador2Nombre}
-                          </span>
-                          {match.resultado && (
-                            <span className={`text-lg font-bold ${
-                              match.resultado.ganadorId === match.jugador2Id
-                                ? 'text-green-400'
-                                : 'text-gray-400'
-                            }`}>
-                              {match.resultado.setsJugador2}
-                            </span>
-                          )}
-                        </div>
+                        </span>
+                        <span className="font-semibold text-lg text-blue-400 text-center">
+                          {match.jugador2Nombre}
+                        </span>
                       </div>
-
-                      {/* Información adicional */}
-                      <div className="border-t border-gray-700/50 pt-3">
-                        <div className="flex items-center justify-between text-sm text-gray-400">
-                          <div className="flex items-center space-x-1">
-                            <MapPin className="w-3 h-3" />
-                            <span>{t('calendar.location')}</span>
-                          </div>
-                          <span>{formatDate(match.fecha)}</span>
-                        </div>
-                      </div>
-                      
-                      {/* Ganador */}
-                      {match.completado && match.resultado && (
-                        <div className="mt-3 p-3 bg-green-600/10 border border-green-500/20 rounded-lg">
-                          <div className="text-center">
-                            <span className="text-sm text-gray-400">{t('calendar.winner')}</span>
-                            <div className="font-bold text-green-400">
-                              {match.resultado.ganadorId === match.jugador1Id
-                                ? match.jugador1Nombre
-                                : match.jugador2Nombre}
-                            </div>
-                          </div>
-                        </div>
-                      )}
                     </motion.div>
                   ))}
                 </div>
