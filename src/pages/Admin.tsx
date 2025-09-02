@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Users, Settings, Save, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Users, Settings, Save, X, ClipboardList } from 'lucide-react';
 import {
   playersService,
   groupsService,
@@ -8,19 +8,25 @@ import {
   Player,
   Group,
   Match,
-  Timestamp
+  Timestamp,
+  db,
+  doc,
+  writeBatch
 } from '../firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Admin: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'players' | 'groups'>('players');
+  const [activeTab, setActiveTab] = useState<'players' | 'groups' | 'results'>('players');
   const [showPlayerForm, setShowPlayerForm] = useState(false);
   const [showGroupForm, setShowGroupForm] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
+  const [showResultForm, setShowResultForm] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
 
   // Estados para formularios
   const [playerForm, setPlayerForm] = useState({
@@ -33,6 +39,11 @@ const Admin: React.FC = () => {
     nombre: ''
   });
 
+  const [resultForm, setResultForm] = useState({
+    setsJugador1: 0,
+    setsJugador2: 0
+  });
+
   useEffect(() => {
     loadData();
   }, []);
@@ -40,12 +51,14 @@ const Admin: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [playersData, groupsData] = await Promise.all([
+      const [playersData, groupsData, matchesData] = await Promise.all([
         playersService.getAll(),
-        groupsService.getAll()
+        groupsService.getAll(),
+        matchesService.getAll()
       ]);
       setPlayers(playersData);
       setGroups(groupsData);
+      setMatches(matchesData);
     } catch (error) {
       console.error('Error cargando datos:', error);
     } finally {
@@ -228,13 +241,94 @@ const Admin: React.FC = () => {
     }
   };
 
+  const handleOpenResultModal = (match: Match) => {
+    setSelectedMatch(match);
+    setShowResultForm(true);
+  };
+
+  const handleResultSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedMatch) return;
+
+    const { setsJugador1, setsJugador2 } = resultForm;
+
+    if (setsJugador1 === setsJugador2) {
+      alert('Los resultados no pueden ser iguales.');
+      return;
+    }
+
+    try {
+      const batch = writeBatch(db);
+
+      const ganadorId = setsJugador1 > setsJugador2 ? selectedMatch.jugador1Id : selectedMatch.jugador2Id;
+      const perdedorId = setsJugador1 < setsJugador2 ? selectedMatch.jugador1Id : selectedMatch.jugador2Id;
+
+      // 1. Actualizar el partido
+      const matchRef = doc(db, 'matches', selectedMatch.id!);
+      batch.update(matchRef, {
+        completado: true,
+        resultado: {
+          ganadorId,
+          setsJugador1,
+          setsJugador2,
+        },
+      });
+
+      const jugador1 = players.find(p => p.id === selectedMatch.jugador1Id);
+      const jugador2 = players.find(p => p.id === selectedMatch.jugador2Id);
+
+      if (!jugador1 || !jugador2) {
+        throw new Error("No se encontraron los jugadores del partido.");
+      }
+
+      // 2. Actualizar jugadores
+      const ganadorRef = doc(db, 'players', ganadorId);
+      const perdedorRef = doc(db, 'players', perdedorId);
+
+      const ganador = ganadorId === jugador1.id ? jugador1 : jugador2;
+      const perdedor = perdedorId === jugador1.id ? jugador1 : jugador2;
+
+      const setsGanador = ganadorId === jugador1.id ? setsJugador1 : setsJugador2;
+      const setsPerdedor = perdedorId === jugador1.id ? setsJugador1 : setsJugador2;
+
+      batch.update(ganadorRef, {
+        partidasJugadas: ganador.partidasJugadas + 1,
+        partidasGanadas: ganador.partidasGanadas + 1,
+        puntos: ganador.puntos + 3,
+        juegosGanados: ganador.juegosGanados + setsGanador,
+        juegosPerdidos: ganador.juegosPerdidos + setsPerdedor,
+      });
+
+      batch.update(perdedorRef, {
+        partidasJugadas: perdedor.partidasJugadas + 1,
+        partidasPerdidas: perdedor.partidasPerdidas + 1,
+        juegosGanados: perdedor.juegosGanados + setsPerdedor,
+        juegosPerdidos: perdedor.juegosPerdidos + setsGanador,
+      });
+
+      await batch.commit();
+
+      alert('Resultado guardado correctamente.');
+      resetForms();
+      loadData();
+
+    } catch (error) {
+      console.error('Error guardando el resultado:', error);
+      alert('Hubo un error al guardar el resultado.');
+    }
+  };
+
   const resetForms = () => {
     setPlayerForm({ nombre: '', grupo: '', esNovato: false });
     setGroupForm({ nombre: '' });
+    setResultForm({ setsJugador1: 0, setsJugador2: 0 });
     setEditingPlayer(null);
     setEditingGroup(null);
+    setSelectedMatch(null);
     setShowPlayerForm(false);
     setShowGroupForm(false);
+    setShowResultForm(false);
   };
 
   if (loading) {
@@ -284,8 +378,61 @@ const Admin: React.FC = () => {
               <Settings className="inline-block w-5 h-5 mr-2" />
               Grupos
             </button>
+            <button
+              onClick={() => setActiveTab('results')}
+              className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                activeTab === 'results'
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
+                  : 'text-gray-400 hover:text-purple-400'
+              }`}
+            >
+              <ClipboardList className="inline-block w-5 h-5 mr-2" />
+              Resultados
+            </button>
           </div>
         </div>
+
+        {/* Contenido de Resultados */}
+        {activeTab === 'results' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gold-400">Partidos Pendientes</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {matches
+                .filter((match) => !match.completado)
+                .map((match) => (
+                  <motion.div
+                    key={match.id}
+                    className="card bg-gradient-to-br from-gray-900/20 to-purple-900/20 border-gray-500/30"
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-300">
+                          {match.jugador1Nombre} vs {match.jugador2Nombre}
+                        </h3>
+                        <p className="text-sm text-purple-400">
+                          Grupo: {match.grupo} - Semana: {match.semana}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleOpenResultModal(match)}
+                        className="btn btn-primary flex items-center space-x-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Resultado</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Contenido de Jugadores */}
         {activeTab === 'players' && (
@@ -552,6 +699,81 @@ const Admin: React.FC = () => {
                 >
                   <Save className="w-5 h-5" />
                   <span>{editingGroup ? 'Actualizar' : 'Guardar'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={resetForms}
+                  className="flex-1 btn btn-secondary"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Modal Formulario Resultado */}
+      {showResultForm && selectedMatch && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <motion.div
+            className="card bg-black/90 border-purple-500/50 max-w-md w-full"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-purple-400">
+                Añadir Resultado
+              </h3>
+              <button
+                onClick={resetForms}
+                className="text-gray-400 hover:text-red-400 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleResultSubmit} className="space-y-4">
+              <p className="text-center font-semibold text-lg text-white">
+                {selectedMatch.jugador1Nombre} vs {selectedMatch.jugador2Nombre}
+              </p>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Juegos ganados por {selectedMatch.jugador1Nombre}
+                </label>
+                <input
+                  type="number"
+                  value={resultForm.setsJugador1}
+                  onChange={(e) => setResultForm({ ...resultForm, setsJugador1: parseInt(e.target.value) || 0 })}
+                  className="w-full px-4 py-2 bg-gray-900/50 border border-gray-600 rounded-lg focus:border-purple-500 text-white"
+                  required
+                  min="0"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Juegos ganados por {selectedMatch.jugador2Nombre}
+                </label>
+                <input
+                  type="number"
+                  value={resultForm.setsJugador2}
+                  onChange={(e) => setResultForm({ ...resultForm, setsJugador2: parseInt(e.target.value) || 0 })}
+                  className="w-full px-4 py-2 bg-gray-900/50 border border-gray-600 rounded-lg focus:border-purple-500 text-white"
+                  required
+                  min="0"
+                />
+              </div>
+
+              <div className="flex space-x-4 pt-4">
+                <button
+                  type="submit"
+                  className="flex-1 btn btn-success flex items-center justify-center space-x-2"
+                >
+                  <Save className="w-5 h-5" />
+                  <span>Guardar Resultado</span>
                 </button>
                 <button
                   type="button"
