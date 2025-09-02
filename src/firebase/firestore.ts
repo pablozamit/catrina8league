@@ -160,5 +160,18 @@ export const matchesService = {
     });
 
     await batch.commit();
+  },
+
+  // Borrar todos los partidos del calendario
+  clearCalendar: async (): Promise<void> => {
+    const matchesRef = collection(db, 'matches');
+    const existing = await getDocs(matchesRef);
+    const batch = writeBatch(db);
+
+    existing.forEach((docSnap) => batch.delete(docSnap.ref));
+
+    await batch.commit();
   }
 };
+
+export { db, doc, writeBatch, Timestamp };
