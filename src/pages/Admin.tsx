@@ -7,7 +7,8 @@ import {
   matchesService,
   Player,
   Group,
-  Match
+  Match,
+  Timestamp
 } from '../firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -149,8 +150,12 @@ const Admin: React.FC = () => {
     const n = list.length;
     const rounds = n - 1;
     const matches: Omit<Match, 'id'>[] = [];
+    const startDate = new Date('2025-09-08T00:00:00');
 
     for (let round = 0; round < rounds; round++) {
+      const weekDate = new Date(startDate);
+      weekDate.setDate(weekDate.getDate() + round * 7);
+
       for (let i = 0; i < n / 2; i++) {
         const p1 = list[i];
         const p2 = list[n - 1 - i];
@@ -161,7 +166,8 @@ const Admin: React.FC = () => {
           jugador2Nombre: p2.nombre,
           grupo: groupName,
           semana: round + 1,
-          completado: false
+          completado: false,
+          fecha: Timestamp.fromDate(weekDate)
         });
       }
       const last = list.pop();
@@ -202,6 +208,23 @@ const Admin: React.FC = () => {
     } catch (error) {
       console.error('Error generando calendario:', error);
       alert('Error generando calendario');
+    }
+  };
+
+  const handleDeleteCalendar = async () => {
+    if (
+      !window.confirm(
+        '¡ATENCIÓN! Esta acción es irreversible y borrará TODOS los partidos del calendario. ¿Estás seguro de que quieres continuar?'
+      )
+    ) {
+      return;
+    }
+    try {
+      await matchesService.replaceCalendar([]);
+      alert('El calendario ha sido borrado correctamente.');
+    } catch (error) {
+      console.error('Error borrando el calendario:', error);
+      alert('Ha ocurrido un error al borrar el calendario.');
     }
   };
 
@@ -346,6 +369,12 @@ const Admin: React.FC = () => {
                   className="btn btn-secondary flex items-center space-x-2 disabled:opacity-50"
                 >
                   Generar Calendario Completo
+                </button>
+                 <button
+                  onClick={handleDeleteCalendar}
+                  className="btn btn-danger flex items-center space-x-2"
+                >
+                  Borrar Calendario
                 </button>
               </div>
             </div>
