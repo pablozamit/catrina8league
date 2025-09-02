@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 const Calendar: React.FC = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentWeek, setCurrentWeek] = useState(0);
+  const [currentWeek, setCurrentWeek] = useState(1);
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const Calendar: React.FC = () => {
   };
 
   const getMaxWeek = () => {
-    if (matches.length === 0) return 0;
+    if (matches.length === 0) return 1;
     return Math.max(...matches.map(match => match.semana));
   };
 
@@ -90,29 +90,29 @@ const Calendar: React.FC = () => {
         >
           <div className="flex items-center bg-black/50 rounded-lg border border-blue-500/30 p-2">
             <button
-              onClick={() => setCurrentWeek(Math.max(0, currentWeek - 1))}
-              disabled={currentWeek === 0}
+              onClick={() => setCurrentWeek(Math.max(1, currentWeek - 1))}
+              disabled={currentWeek === 1}
               className={`p-3 rounded-lg transition-all duration-300 ${
-                currentWeek === 0
+                currentWeek === 1
                   ? 'text-gray-600 cursor-not-allowed'
                   : 'text-blue-400 hover:bg-blue-600/20 hover:text-blue-300'
               }`}
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
-            
+
             <div className="px-8 py-3 text-center">
               <div className="flex items-center space-x-2">
                 <CalendarIcon className="w-5 h-5 text-blue-400" />
                   <span className="text-xl font-bold text-blue-400">
-                    {t('calendar.week', { week: currentWeek + 1 })}
+                    {t('calendar.week', { week: currentWeek })}
                   </span>
                 </div>
                 <p className="text-sm text-gray-400 mt-1">
                   {t('calendar.scheduledMatches', { count: weekMatches.length })}
                 </p>
             </div>
-            
+
             <button
               onClick={() => setCurrentWeek(Math.min(maxWeek, currentWeek + 1))}
               disabled={currentWeek >= maxWeek}
@@ -142,7 +142,7 @@ const Calendar: React.FC = () => {
                 {t('calendar.noMatches')}
               </h3>
               <p className="text-gray-500">
-                {t('calendar.noMatchesForWeek', { week: currentWeek + 1 })}
+                {t('calendar.noMatchesForWeek', { week: currentWeek })}
               </p>
           </motion.div>
         ) : (
@@ -219,12 +219,12 @@ const Calendar: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.5 }}
         >
           <div className="flex space-x-2">
-            {Array.from({ length: maxWeek + 1 }, (_, i) => (
+            {Array.from({ length: maxWeek }, (_, i) => (
               <button
-                key={i}
-                onClick={() => setCurrentWeek(i)}
+                key={i + 1}
+                onClick={() => setCurrentWeek(i + 1)}
                 className={`w-10 h-10 rounded-lg font-semibold transition-all duration-300 ${
-                  i === currentWeek
+                  i + 1 === currentWeek
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
                     : 'bg-black/30 text-gray-400 hover:bg-blue-600/20 hover:text-blue-400'
                 }`}
