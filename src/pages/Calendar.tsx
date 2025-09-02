@@ -185,14 +185,20 @@ const Calendar: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: 0.05 * matchIndex }}
                     >
-                      {/* Jugadores */}
+                      {/* Jugadores y resultado */}
                       <div className="flex flex-col items-center justify-center space-y-2">
                         <span className="font-semibold text-lg text-blue-400 text-center">
                           {match.jugador1Nombre}
                         </span>
-                        <span className="text-center text-gray-500 font-bold text-sm">
-                          VS
-                        </span>
+                        {match.completado && match.resultado ? (
+                          <span className="text-center text-purple-400 font-bold text-sm">
+                            {match.resultado.setsJugador1} - {match.resultado.setsJugador2}
+                          </span>
+                        ) : (
+                          <span className="text-center text-gray-500 font-bold text-sm">
+                            VS
+                          </span>
+                        )}
                         <span className="font-semibold text-lg text-blue-400 text-center">
                           {match.jugador2Nombre}
                         </span>

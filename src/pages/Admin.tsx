@@ -233,7 +233,7 @@ const Admin: React.FC = () => {
       return;
     }
     try {
-      await matchesService.replaceCalendar([]);
+      await matchesService.clearCalendar();
       alert('El calendario ha sido borrado correctamente.');
     } catch (error) {
       console.error('Error borrando el calendario:', error);
