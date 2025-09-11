@@ -46,9 +46,13 @@ const Standings: React.FC = () => {
         if (b.puntos !== a.puntos) {
           return b.puntos - a.puntos;
         }
-        if (b.partidasGanadas !== a.partidasGanadas) {
-          return b.partidasGanadas - a.partidasGanadas;
+        // En caso de empate a puntos, se desempata por la diferencia de juegos ganados y perdidos
+        const diffB = b.juegosGanados - b.juegosPerdidos;
+        const diffA = a.juegosGanados - a.juegosPerdidos;
+        if (diffB !== diffA) {
+          return diffB - diffA;
         }
+        // Como último criterio, se desempata por juegos ganados
         return b.juegosGanados - a.juegosGanados;
       });
   };
@@ -67,10 +71,13 @@ const Standings: React.FC = () => {
     }
   };
 
-  // Calcular porcentaje de victorias
+  // Calcular porcentaje de victorias en base a juegos
   const getWinPercentage = (player: Player) => {
-    if (player.partidasJugadas === 0) return 0;
-    return Math.round((player.partidasGanadas / player.partidasJugadas) * 100);
+    const totalJuegos = player.juegosGanados + player.juegosPerdidos;
+    if (totalJuegos === 0) {
+      return 0;
+    }
+    return Math.round((player.juegosGanados / totalJuegos) * 100);
   };
 
   // Obtener color según la posición
