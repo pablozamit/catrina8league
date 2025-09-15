@@ -13,6 +13,7 @@ import {
   doc,
   writeBatch
 } from '../firebase/firestore';
+import { getDoc } from 'firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Admin: React.FC = () => {
@@ -243,6 +244,14 @@ const Admin: React.FC = () => {
 
   const handleOpenResultModal = (match: Match) => {
     setSelectedMatch(match);
+    if (match.completado && match.resultado) {
+      setResultForm({
+        setsJugador1: match.resultado.setsJugador1,
+        setsJugador2: match.resultado.setsJugador2,
+      });
+    } else {
+      setResultForm({ setsJugador1: 0, setsJugador2: 0 });
+    }
     setShowResultForm(true);
   };
 
@@ -260,51 +269,105 @@ const Admin: React.FC = () => {
 
     try {
       const batch = writeBatch(db);
+      const isEditing = selectedMatch.completado;
 
-      const ganadorId = setsJugador1 > setsJugador2 ? selectedMatch.jugador1Id : selectedMatch.jugador2Id;
-      const perdedorId = setsJugador1 < setsJugador2 ? selectedMatch.jugador1Id : selectedMatch.jugador2Id;
+      // Obtener los datos más actualizados de los jugadores ANTES de hacer cualquier cálculo
+      const jugador1Ref = doc(db, 'players', selectedMatch.jugador1Id);
+      const jugador2Ref = doc(db, 'players', selectedMatch.jugador2Id);
+      const [jugador1Snap, jugador2Snap] = await Promise.all([
+        getDoc(jugador1Ref),
+        getDoc(jugador2Ref)
+      ]);
 
-      // 1. Actualizar el partido
+      if (!jugador1Snap.exists() || !jugador2Snap.exists()) {
+        throw new Error('No se encontraron los jugadores del partido en la base de datos.');
+      }
+
+      const jugador1 = { id: jugador1Snap.id, ...jugador1Snap.data() } as Player;
+      const jugador2 = { id: jugador2Snap.id, ...jugador2Snap.data() } as Player;
+
+
+      // Revertir estadísticas si se está editando un resultado existente
+      if (isEditing && selectedMatch.resultado) {
+        const oldResult = selectedMatch.resultado;
+        const oldGanadorId = oldResult.ganadorId;
+
+        const oldSetsGanador = oldGanadorId === jugador1.id ? oldResult.setsJugador1 : oldResult.setsJugador2;
+        const oldSetsPerdedor = oldGanadorId === jugador1.id ? oldResult.setsJugador2 : oldResult.setsJugador1;
+
+        if (oldGanadorId === jugador1.id) {
+            // Jugador 1 era el ganador
+            jugador1.partidasGanadas -= 1;
+            jugador1.puntos -= 3;
+            jugador1.juegosGanados -= oldSetsGanador;
+            jugador1.juegosPerdidos -= oldSetsPerdedor;
+
+            jugador2.partidasPerdidas -= 1;
+            jugador2.juegosGanados -= oldSetsPerdedor;
+            jugador2.juegosPerdidos -= oldSetsGanador;
+        } else {
+            // Jugador 2 era el ganador
+            jugador2.partidasGanadas -= 1;
+            jugador2.puntos -= 3;
+            jugador2.juegosGanados -= oldSetsGanador;
+            jugador2.juegosPerdidos -= oldSetsPerdedor;
+
+            jugador1.partidasPerdidas -= 1;
+            jugador1.juegosGanados -= oldSetsPerdedor;
+            jugador1.juegosPerdidos -= oldSetsGanador;
+        }
+      }
+
+      // Aplicar nuevas estadísticas
+      const newGanadorId = setsJugador1 > setsJugador2 ? jugador1.id! : jugador2.id!;
+
+      const newSetsGanador = setsJugador1 > setsJugador2 ? setsJugador1 : setsJugador2;
+      const newSetsPerdedor = setsJugador1 > setsJugador2 ? setsJugador2 : setsJugador1;
+
+      if (newGanadorId === jugador1.id) {
+        // Jugador 1 es el nuevo ganador
+        jugador1.partidasGanadas += 1;
+        jugador1.puntos += 3;
+        jugador1.juegosGanados += newSetsGanador;
+        jugador1.juegosPerdidos += newSetsPerdedor;
+        if (!isEditing) jugador1.partidasJugadas +=1;
+
+        jugador2.partidasPerdidas += 1;
+        jugador2.juegosGanados += newSetsPerdedor;
+        jugador2.juegosPerdidos += newSetsGanador;
+        if (!isEditing) jugador2.partidasJugadas +=1;
+
+      } else {
+        // Jugador 2 es el nuevo ganador
+        jugador2.partidasGanadas += 1;
+        jugador2.puntos += 3;
+        jugador2.juegosGanados += newSetsGanador;
+        jugador2.juegosPerdidos += newSetsPerdedor;
+        if (!isEditing) jugador2.partidasJugadas +=1;
+
+        jugador1.partidasPerdidas += 1;
+        jugador1.juegosGanados += newSetsPerdedor;
+        jugador1.juegosPerdidos += newSetsGanador;
+        if (!isEditing) jugador1.partidasJugadas +=1;
+      }
+
+      // Actualizar datos de los jugadores en el batch
+      const { id: id1, ...player1Data } = jugador1;
+      batch.update(jugador1Ref, player1Data);
+
+      const { id: id2, ...player2Data } = jugador2;
+      batch.update(jugador2Ref, player2Data);
+
+
+      // Actualizar el partido
       const matchRef = doc(db, 'matches', selectedMatch.id!);
       batch.update(matchRef, {
         completado: true,
         resultado: {
-          ganadorId,
+          ganadorId: newGanadorId,
           setsJugador1,
           setsJugador2,
         },
-      });
-
-      const jugador1 = players.find(p => p.id === selectedMatch.jugador1Id);
-      const jugador2 = players.find(p => p.id === selectedMatch.jugador2Id);
-
-      if (!jugador1 || !jugador2) {
-        throw new Error("No se encontraron los jugadores del partido.");
-      }
-
-      // 2. Actualizar jugadores
-      const ganadorRef = doc(db, 'players', ganadorId);
-      const perdedorRef = doc(db, 'players', perdedorId);
-
-      const ganador = ganadorId === jugador1.id ? jugador1 : jugador2;
-      const perdedor = perdedorId === jugador1.id ? jugador1 : jugador2;
-
-      const setsGanador = ganadorId === jugador1.id ? setsJugador1 : setsJugador2;
-      const setsPerdedor = perdedorId === jugador1.id ? setsJugador1 : setsJugador2;
-
-      batch.update(ganadorRef, {
-        partidasJugadas: ganador.partidasJugadas + 1,
-        partidasGanadas: ganador.partidasGanadas + 1,
-        puntos: ganador.puntos + 3,
-        juegosGanados: ganador.juegosGanados + setsGanador,
-        juegosPerdidos: ganador.juegosPerdidos + setsPerdedor,
-      });
-
-      batch.update(perdedorRef, {
-        partidasJugadas: perdedor.partidasJugadas + 1,
-        partidasPerdidas: perdedor.partidasPerdidas + 1,
-        juegosGanados: perdedor.juegosGanados + setsPerdedor,
-        juegosPerdidos: perdedor.juegosPerdidos + setsGanador,
       });
 
       await batch.commit();
@@ -400,15 +463,20 @@ const Admin: React.FC = () => {
             transition={{ duration: 0.5 }}
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gold-400">Partidos Pendientes</h2>
+              <h2 className="text-2xl font-bold text-gold-400">Gestión de Resultados</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {matches
-                .filter((match) => !match.completado)
+                .sort((a, b) => {
+                  if (a.semana !== b.semana) {
+                    return a.semana - b.semana;
+                  }
+                  return a.grupo.localeCompare(b.grupo);
+                })
                 .map((match) => (
                   <motion.div
                     key={match.id}
-                    className="card bg-gradient-to-br from-gray-900/20 to-purple-900/20 border-gray-500/30"
+                    className={`card bg-gradient-to-br from-gray-900/20 to-purple-900/20 border-gray-500/30 ${match.completado ? 'opacity-60' : ''}`}
                     whileHover={{ scale: 1.02 }}
                   >
                     <div className="flex justify-between items-start mb-4">
@@ -419,13 +487,18 @@ const Admin: React.FC = () => {
                         <p className="text-sm text-purple-400">
                           Grupo: {match.grupo} - Semana: {match.semana}
                         </p>
+                        {match.completado && match.resultado && (
+                            <p className="text-sm text-green-400 font-bold mt-1">
+                                Resultado: {match.resultado.setsJugador1} - {match.resultado.setsJugador2}
+                            </p>
+                        )}
                       </div>
                       <button
                         onClick={() => handleOpenResultModal(match)}
                         className="btn btn-primary flex items-center space-x-2"
                       >
-                        <Plus className="w-4 h-4" />
-                        <span>Resultado</span>
+                        {match.completado ? <Edit2 className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                        <span>{match.completado ? 'Editar' : 'Resultado'}</span>
                       </button>
                     </div>
                   </motion.div>
