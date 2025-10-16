@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { KeyRound, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -38,24 +38,22 @@ const Login: React.FC = () => {
       >
         <div className="text-center mb-8">
           <motion.div
-            className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto mb-6 flex items-center justify-center"
+            className="w-20 h-20 bg-gradient-to-r from-orange-500 to-purple-600 rounded-full mx-auto mb-6 flex items-center justify-center"
             animate={{
               boxShadow: [
-                '0 0 20px rgba(139, 92, 246, 0.3)',
+                '0 0 20px rgba(255, 107, 0, 0.4)',
                 '0 0 40px rgba(139, 92, 246, 0.5)',
-                '0 0 20px rgba(139, 92, 246, 0.3)'
-              ]
+                '0 0 20px rgba(255, 107, 0, 0.4)',
+              ],
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <Lock className="w-10 h-10 text-white" />
+            <KeyRound className="w-10 h-10 text-white" />
           </motion.div>
-          <h2 className="text-3xl font-bold text-purple-400 mb-2">
+          <h2 className="text-3xl font-bold text-orange-400 mb-2 animate-glow-orange">
             {t('login.title')}
           </h2>
-          <p className="text-gray-400">
-            {t('login.subtitle')}
-          </p>
+          <p className="text-gray-400">{t('login.subtitle')}</p>
         </div>
 
         <motion.div
@@ -70,21 +68,25 @@ const Login: React.FC = () => {
                 {t('login.password')}
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <KeyRound className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-12 py-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder-gray-400"
+                  className="w-full pl-10 pr-12 py-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-white placeholder-gray-400"
                   placeholder="••••••••"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-400 transition-colors"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-400 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -102,7 +104,7 @@ const Login: React.FC = () => {
 
             <motion.button
               type="submit"
-              className="w-full py-3 px-4 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+              className="w-full py-3 px-4 rounded-lg font-semibold text-white bg-gradient-to-r from-orange-600 to-purple-600 hover:from-orange-500 hover:to-purple-500 shadow-lg hover:shadow-orange-500/25 transition-all duration-300"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >

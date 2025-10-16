@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Medal, Award, Users } from 'lucide-react';
-import { playersService, groupsService, Player, Group } from '../firebase/firestore';
+import { Skull, Ghost, Sparkles, Users } from 'lucide-react';
+import {
+  playersService,
+  groupsService,
+  Player,
+  Group,
+} from '../firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useTranslation } from 'react-i18next';
 
@@ -21,13 +26,14 @@ const Standings: React.FC = () => {
       setLoading(true);
       const [playersData, groupsData] = await Promise.all([
         playersService.getAll(),
-        groupsService.getAll()
+        groupsService.getAll(),
       ]);
       setPlayers(playersData);
-      const sortedGroups = groupsData.sort((a, b) => a.nombre.localeCompare(b.nombre));
+      const sortedGroups = groupsData.sort((a, b) =>
+        a.nombre.localeCompare(b.nombre),
+      );
       setGroups(sortedGroups);
 
-      // Seleccionar el primer grupo por defecto
       if (sortedGroups.length > 0 && !selectedGroup) {
         setSelectedGroup(sortedGroups[0].nombre);
       }
@@ -38,40 +44,39 @@ const Standings: React.FC = () => {
     }
   };
 
-  // Obtener jugadores del grupo seleccionado ordenados por puntos
   const getGroupPlayers = (groupName: string) => {
     return players
-      .filter(player => player.grupo === groupName)
+      .filter((player) => player.grupo === groupName)
       .sort((a, b) => {
         if (b.puntos !== a.puntos) {
           return b.puntos - a.puntos;
         }
-        // En caso de empate a puntos, se desempata por la diferencia de juegos ganados y perdidos
         const diffB = b.juegosGanados - b.juegosPerdidos;
         const diffA = a.juegosGanados - a.juegosPerdidos;
         if (diffB !== diffA) {
           return diffB - diffA;
         }
-        // Como último criterio, se desempata por juegos ganados
         return b.juegosGanados - a.juegosGanados;
       });
   };
 
-  // Obtener icono de posición
   const getPositionIcon = (position: number) => {
     switch (position) {
       case 1:
-        return <Trophy className="w-6 h-6 text-gold-400" />;
+        return <Skull className="w-6 h-6 text-orange-400" />;
       case 2:
-        return <Medal className="w-6 h-6 text-gray-300" />;
+        return <Ghost className="w-6 h-6 text-purple-400" />;
       case 3:
-        return <Award className="w-6 h-6 text-orange-400" />;
+        return <Sparkles className="w-6 h-6 text-lime-400" />;
       default:
-        return <span className="w-6 h-6 flex items-center justify-center text-gray-400 font-bold">{position}</span>;
+        return (
+          <span className="w-6 h-6 flex items-center justify-center text-gray-400 font-bold">
+            {position}
+          </span>
+        );
     }
   };
 
-  // Calcular porcentaje de victorias en base a juegos
   const getWinPercentage = (player: Player) => {
     const totalJuegos = player.juegosGanados + player.juegosPerdidos;
     if (totalJuegos === 0) {
@@ -80,17 +85,16 @@ const Standings: React.FC = () => {
     return Math.round((player.juegosGanados / totalJuegos) * 100);
   };
 
-  // Obtener color según la posición
   const getPositionColor = (position: number) => {
     switch (position) {
       case 1:
-        return 'from-yellow-900/30 to-gold-900/30 border-gold-500/50';
+        return 'from-orange-900/30 to-yellow-900/30 border-orange-500/50';
       case 2:
-        return 'from-gray-800/30 to-gray-700/30 border-gray-400/50';
+        return 'from-purple-800/30 to-indigo-700/30 border-purple-400/50';
       case 3:
-        return 'from-orange-900/30 to-red-900/30 border-orange-500/50';
+        return 'from-lime-900/30 to-green-900/30 border-lime-500/50';
       default:
-        return 'from-blue-900/20 to-purple-900/20 border-blue-500/30';
+        return 'from-gray-800/20 to-black/20 border-gray-700/30';
     }
   };
 
@@ -103,14 +107,13 @@ const Standings: React.FC = () => {
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
-        {/* Header */}
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gold-400">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-orange-400 animate-glow-orange">
             {t('standings.title')}
           </h1>
           <p className="text-xl text-gray-300">
@@ -118,7 +121,6 @@ const Standings: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Selector de grupos */}
         {groups.length > 0 && (
           <motion.div
             className="flex justify-center mb-8"
@@ -147,7 +149,6 @@ const Standings: React.FC = () => {
 
         {selectedGroup && (
           <>
-            {/* Tabla de clasificación */}
             <motion.div
               className="space-y-4"
               initial={{ opacity: 0, y: 20 }}
@@ -175,95 +176,127 @@ const Standings: React.FC = () => {
                   {groupPlayers.map((player, index) => {
                     const position = index + 1;
                     const winPercentage = getWinPercentage(player);
-                    
+
                     return (
                       <motion.div
                         key={player.id}
-                        className={`card bg-gradient-to-r ${getPositionColor(position)} hover:scale-[1.02] transition-all duration-300 ${index < 4 ? 'border-2 border-purple-400' : ''}`}
+                        className={`card bg-gradient-to-r ${getPositionColor(
+                          position,
+                        )} hover:scale-[1.02] transition-all duration-300 ${
+                          index < 3 ? 'border-2 border-purple-400' : ''
+                        }`}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4, delay: 0.05 * index }}
                         whileHover={{ y: -2 }}
                       >
                         <div className="flex items-center space-x-4">
-                          {/* Posición */}
                           <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center">
                             {getPositionIcon(position)}
                           </div>
 
-                          {/* Información del jugador */}
                           <div className="flex-grow min-w-0">
                             <div className="flex items-center justify-between">
-                              <h3 className={`text-lg font-bold truncate ${
-                                position <= 3 ? 'text-white' : 'text-blue-400'
-                              }`}>
-                                {player.nombre}{player.esNovato && ' 👶'}
+                              <h3
+                                className={`text-lg font-bold truncate ${
+                                  position <= 3
+                                    ? 'text-white'
+                                    : 'text-orange-400'
+                                }`}
+                              >
+                                {player.nombre}
+                                {player.esNovato && ' 🎃'}
                               </h3>
                               <div className="text-right">
-                                <div className={`text-xl font-bold ${
-                                  position <= 3 ? 'text-white' : 'text-blue-400'
-                                }`}>
+                                <div
+                                  className={`text-xl font-bold ${
+                                    position <= 3
+                                      ? 'text-white'
+                                      : 'text-orange-400'
+                                  }`}
+                                >
                                   {player.puntos} pts
                                 </div>
                               </div>
                             </div>
-                            
-                            {/* Estadísticas */}
+
                             <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mt-3 text-sm">
                               <div className="text-center">
-                                <div className="text-gray-400">{t('standings.stats.matches')}</div>
+                                <div className="text-gray-400">
+                                  {t('standings.stats.matches')}
+                                </div>
                                 <div className="font-semibold text-white">
                                   {player.partidasJugadas}
                                 </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400">{t('standings.stats.won')}</div>
+                                <div className="text-gray-400">
+                                  {t('standings.stats.won')}
+                                </div>
                                 <div className="font-semibold text-green-400">
                                   {player.partidasGanadas}
                                 </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400">{t('standings.stats.lost')}</div>
+                                <div className="text-gray-400">
+                                  {t('standings.stats.lost')}
+                                </div>
                                 <div className="font-semibold text-red-400">
                                   {player.partidasPerdidas}
                                 </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400">{t('standings.stats.gamesWon')}</div>
+                                <div className="text-gray-400">
+                                  {t('standings.stats.gamesWon')}
+                                </div>
                                 <div className="font-semibold text-green-400">
                                   {player.juegosGanados}
                                 </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400">{t('standings.stats.gamesLost')}</div>
+                                <div className="text-gray-400">
+                                  {t('standings.stats.gamesLost')}
+                                </div>
                                 <div className="font-semibold text-red-400">
                                   {player.juegosPerdidos}
                                 </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400">{t('standings.stats.winPercentage')}</div>
-                                <div className={`font-semibold ${
-                                  winPercentage >= 70 ? 'text-green-400' :
-                                  winPercentage >= 50 ? 'text-yellow-400' : 'text-red-400'
-                                }`}>
+                                <div className="text-gray-400">
+                                  {t('standings.stats.winPercentage')}
+                                </div>
+                                <div
+                                  className={`font-semibold ${
+                                    winPercentage >= 70
+                                      ? 'text-green-400'
+                                      : winPercentage >= 50
+                                      ? 'text-yellow-400'
+                                      : 'text-red-400'
+                                  }`}
+                                >
                                   {winPercentage}%
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                        
-                        {/* Barra de progreso para % de victorias */}
+
                         <div className="mt-3">
                           <div className="w-full bg-gray-700/50 rounded-full h-2">
                             <motion.div
                               className={`h-2 rounded-full ${
-                                winPercentage >= 70 ? 'bg-green-400' :
-                                winPercentage >= 50 ? 'bg-yellow-400' : 'bg-red-400'
+                                winPercentage >= 70
+                                  ? 'bg-green-400'
+                                  : winPercentage >= 50
+                                  ? 'bg-yellow-400'
+                                  : 'bg-red-400'
                               }`}
                               initial={{ width: 0 }}
                               animate={{ width: `${winPercentage}%` }}
-                              transition={{ duration: 1, delay: 0.1 * index }}
+                              transition={{
+                                duration: 1,
+                                delay: 0.1 * index,
+                              }}
                             />
                           </div>
                         </div>
@@ -274,24 +307,29 @@ const Standings: React.FC = () => {
               )}
             </motion.div>
 
-            {/* Leyenda */}
             <motion.div
               className="mt-8 p-6 bg-black/30 rounded-lg border border-gray-700/50"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
-              <h3 className="text-lg font-bold text-gray-300 mb-4">{t('standings.legend.title')}</h3>
+              <h3 className="text-lg font-bold text-gray-300 mb-4">
+                {t('standings.legend.title')}
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-400">
                 <div>
-                  <strong className="text-white">{t('standings.legend.scoring')}</strong>
+                  <strong className="text-white">
+                    {t('standings.legend.scoring')}
+                  </strong>
                   <ul className="mt-2 space-y-1">
                     <li>• {t('standings.legend.victory')}</li>
                     <li>• {t('standings.legend.defeat')}</li>
                   </ul>
                 </div>
                 <div>
-                  <strong className="text-white">{t('standings.legend.tieBreak')}</strong>
+                  <strong className="text-white">
+                    {t('standings.legend.tieBreak')}
+                  </strong>
                   <ul className="mt-2 space-y-1">
                     <li>• {t('standings.legend.criterion1')}</li>
                     <li>• {t('standings.legend.criterion2')}</li>
