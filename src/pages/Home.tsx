@@ -2,32 +2,32 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Calendar, Trophy, MessageCircle } from 'lucide-react';
+import { Ghost, Sparkles, Spider } from 'lucide-react';
 import LanguageSelector from '../components/LanguageSelector';
 
 const Home: React.FC = () => {
   const { t } = useTranslation();
   const features = [
     {
-      icon: Calendar,
-      title: 'Calendario',
-      description: 'Consulta la programación de partidos',
+      icon: Ghost,
+      title: 'Calendario Embrujado',
+      description: 'Consulta la programación de partidos espectrales',
       link: '/calendario',
-      color: 'text-blue-400',
+      color: 'text-orange-400',
     },
     {
-      icon: Trophy,
-      title: 'Clasificaciones',
-      description: 'Revisa las posiciones de la liga',
+      icon: Sparkles,
+      title: 'Clasificaciones Mágicas',
+      description: 'Revisa las posiciones de la liga de brujas y magos',
       link: '/clasificaciones',
-      color: 'text-green-400',
+      color: 'text-purple-400',
     },
     {
-      icon: MessageCircle,
-      title: 'Programar Partido',
-      description: 'Usa el asistente para agendar tu partida',
+      icon: Spider,
+      title: 'Programar Hechizo',
+      description: 'Usa el asistente para agendar tu encantamiento',
       link: '/programar',
-      color: 'text-red-400',
+      color: 'text-lime-400',
     },
   ];
   return (
@@ -38,9 +38,9 @@ const Home: React.FC = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-blue-900/20 to-purple-900/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 via-black/20 to-purple-900/20" />
         <div className="absolute inset-0">
-          <div className="w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(0,243,255,0.1),transparent_70%)]" />
+          <div className="w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(255,165,0,0.1),transparent_70%)]" />
         </div>
 
         <div className="relative z-10 container mx-auto px-4">
@@ -48,7 +48,7 @@ const Home: React.FC = () => {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-6xl md:text-8xl font-bold animate-glow"
+            className="text-6xl md:text-8xl font-bold animate-glow-orange"
           >
             {t('home.title')}
           </motion.h1>
@@ -58,7 +58,9 @@ const Home: React.FC = () => {
 
       {/* Features Section */}
       <section className="py-16">
-        <h2 className="text-4xl font-bold text-center mb-12">Explora la Liga</h2>
+        <h2 className="text-4xl font-bold text-center mb-12">
+          Explora la Liga de las Sombras
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature) => {
             const Icon = feature.icon;
