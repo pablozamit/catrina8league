@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Users, Settings, Save, X, ClipboardList } from 'lucide-react';
+import { Plus, Edit2, Trash2, Users, Settings, Save, X, ClipboardList, Download } from 'lucide-react';
+import { exportToCsv, exportToJson } from '../utils/export';
 import {
   playersService,
   groupsService,
@@ -517,13 +518,15 @@ const Admin: React.FC = () => {
             {/* Botón agregar jugador */}
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gold-400">Gestión de Jugadores</h2>
-              <button
-                onClick={() => setShowPlayerForm(true)}
-                className="btn btn-primary flex items-center space-x-2"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Agregar Jugador</span>
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setShowPlayerForm(true)}
+                  className="btn btn-primary flex items-center space-x-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>Agregar Jugador</span>
+                </button>
+              </div>
             </div>
 
             {/* Lista de jugadores */}
@@ -574,7 +577,7 @@ const Admin: React.FC = () => {
           >
             {/* Botón agregar grupo y generar calendario */}
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gold-400">Gestión de Grupos</h2>
+              <h2 className="text-2xl font-bold text-gold-400">Gestión de Grupos y Exportar</h2>
               <div className="flex space-x-2">
                 <button
                   onClick={() => setShowGroupForm(true)}
@@ -588,7 +591,7 @@ const Admin: React.FC = () => {
                   disabled={players.length !== 32 || groups.length !== 4}
                   className="btn btn-secondary flex items-center space-x-2 disabled:opacity-50"
                 >
-                  Generar Calendario Completo
+                  Generar Calendario
                 </button>
                  <button
                   onClick={handleDeleteCalendar}
@@ -603,6 +606,32 @@ const Admin: React.FC = () => {
                 Se requieren exactamente 32 jugadores y 4 grupos para generar el calendario.
               </p>
             )}
+
+            {/* Opciones de Exportación */}
+            <div className="mb-6 p-4 rounded-lg bg-black/30 border border-gray-700/50">
+                <h3 className="text-lg font-bold text-gray-300 mb-3">Exportar Clasificación</h3>
+                <div className="flex space-x-4">
+                    <button
+                        onClick={() => exportToCsv(players, groups.map(g => g.nombre).sort())}
+                        className="btn btn-success flex items-center space-x-2"
+                        disabled={players.length === 0}
+                    >
+                        <Download className="w-5 h-5" />
+                        <span>Exportar a CSV</span>
+                    </button>
+                    <button
+                        onClick={() => exportToJson(players, groups.map(g => g.nombre).sort())}
+                        className="btn btn-info flex items-center space-x-2"
+                        disabled={players.length === 0}
+                    >
+                        <Download className="w-5 h-5" />
+                        <span>Exportar a JSON</span>
+                    </button>
+                </div>
+                {players.length === 0 && (
+                    <p className="text-sm text-gray-500 mt-2">No hay jugadores para exportar.</p>
+                )}
+            </div>
 
             {/* Lista de grupos */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
