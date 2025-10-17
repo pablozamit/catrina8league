@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Skull, Ghost, Sparkles, Users } from 'lucide-react';
+import {
+  calculateQualificationStatus,
+  QualificationStatus,
+} from '../utils/classification';
 import {
   playersService,
   groupsService,
@@ -51,10 +55,8 @@ const Standings: React.FC = () => {
         if (b.puntos !== a.puntos) {
           return b.puntos - a.puntos;
         }
-        const diffB = b.juegosGanados - b.juegosPerdidos;
-        const diffA = a.juegosGanados - a.juegosPerdidos;
-        if (diffB !== diffA) {
-          return diffB - diffA;
+        if (b.partidasGanadas !== a.partidasGanadas) {
+          return b.partidasGanadas - a.partidasGanadas;
         }
         return b.juegosGanados - a.juegosGanados;
       });
@@ -99,6 +101,28 @@ const Standings: React.FC = () => {
   };
 
   const groupPlayers = selectedGroup ? getGroupPlayers(selectedGroup) : [];
+
+  const qualificationStatusByPlayer = useMemo(() => {
+    if (!selectedGroup) return {};
+    const groupPlayers = getGroupPlayers(selectedGroup);
+    return groupPlayers.reduce((acc, player) => {
+      acc[player.id] = calculateQualificationStatus(player, groupPlayers);
+      return acc;
+    }, {} as Record<string, QualificationStatus>);
+  }, [selectedGroup, players]);
+
+  const getStatusShadow = (status: QualificationStatus) => {
+    switch (status) {
+      case 'qualified':
+        return 'shadow-green-500/50';
+      case 'eliminated':
+        return 'shadow-red-500/50';
+      case 'pending':
+        return 'shadow-yellow-500/50';
+      default:
+        return '';
+    }
+  };
 
   if (loading) {
     return <LoadingSpinner />;
@@ -184,6 +208,12 @@ const Standings: React.FC = () => {
                           position,
                         )} hover:scale-[1.02] transition-all duration-300 ${
                           index < 3 ? 'border-2 border-purple-400' : ''
+                        } ${
+                          getStatusShadow(qualificationStatusByPlayer[player.id])
+                            ? `shadow-lg ${getStatusShadow(
+                                qualificationStatusByPlayer[player.id],
+                              )}`
+                            : ''
                         }`}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
