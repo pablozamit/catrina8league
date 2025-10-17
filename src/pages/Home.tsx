@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Ghost, Sparkles, Spider } from 'lucide-react';
+import { Ghost, Sparkles, Spider, Bat } from 'lucide-react';
 import LanguageSelector from '../components/LanguageSelector';
 
 const Home: React.FC = () => {
@@ -39,6 +39,13 @@ const Home: React.FC = () => {
         transition={{ duration: 1 }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 via-black/20 to-purple-900/20" />
+        <motion.div
+          className="absolute top-0 right-10"
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <Spider className="w-16 h-16 text-gray-400" />
+        </motion.div>
         <div className="absolute inset-0">
           <div className="w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(255,165,0,0.1),transparent_70%)]" />
         </div>
@@ -57,7 +64,14 @@ const Home: React.FC = () => {
       </motion.section>
 
       {/* Features Section */}
-      <section className="py-16">
+      <section className="py-16 relative">
+        <motion.div
+          className="absolute top-1/2 left-10"
+          animate={{ x: [0, 20, 0], y: [0, -20, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <Bat className="w-12 h-12 text-purple-400" />
+        </motion.div>
         <h2 className="text-4xl font-bold text-center mb-12">
           Explora la Liga de las Sombras
         </h2>
