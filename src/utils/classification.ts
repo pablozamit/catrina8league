@@ -1,6 +1,18 @@
 import { Player, Match } from '../firebase/firestore';
 import { TFunction } from 'i18next';
 
+// Helper to get all combinations of k elements from an array
+function combinations<T>(arr: T[], k: number): T[][] {
+  if (k === 0) return [[]];
+  if (arr.length < k) return [];
+
+  const [first, ...rest] = arr;
+  const combsWithFirst = combinations(rest, k - 1).map(comb => [first, ...comb]);
+  const combsWithoutFirst = combinations(rest, k);
+
+  return [...combsWithFirst, ...combsWithoutFirst];
+}
+
 export type QualificationStatus = 'qualified' | 'eliminated' | 'pending'; // Eliminamos 'none' por redundancia
 
 const TOTAL_MATCHES = 7;
@@ -27,6 +39,7 @@ const comparePlayers = (a: PlayerScenario, b: PlayerScenario): number => {
 export const calculateQualificationStatus = (
   player: Player,
   groupPlayers: Player[],
+  allMatches: Match[],
 ): QualificationStatus => {
   const playerId = player.id;
   if (!playerId) return 'pending'; // Seguridad por si acaso
@@ -49,31 +62,67 @@ export const calculateQualificationStatus = (
   };
 
   // --- LÓGICA DE CLASIFICACIÓN ('qualified') ---
-  // Contamos cuántos rivales podrían *potencialmente* superar el PEOR caso del jugador (wcp)
-  let countPotentiallyBetterThanWCP = 0;
-  for (const other of otherPlayers) {
-    const remainingMatchesOther = TOTAL_MATCHES - other.partidasJugadas;
-    // Mejor caso del rival (BCO)
-    const bco: PlayerScenario = {
-      ...other,
-      puntos: other.puntos + remainingMatchesOther * POINTS_PER_WIN,
-      partidasGanadas: other.partidasGanadas + remainingMatchesOther,
-      juegosGanados: other.juegosGanados + remainingMatchesOther * 2,
-      partidasJugadas: TOTAL_MATCHES,
-    };
+  // Un jugador está clasificado si no existe ningún grupo de 4 rivales que puedan superarle simultáneamente.
+  const rivals = otherPlayers;
 
-    // Si el mejor caso del rival (bco) es mejor que el peor caso del jugador (wcp)
-    if (comparePlayers(bco, wcp) > 0) { // compare(a,b) > 0 significa a > b
-      countPotentiallyBetterThanWCP++;
+  // Si hay menos de 4 rivales, no pueden sacarlo del top 4.
+  if (rivals.length < TOP_N_QUALIFY) {
+    return 'qualified';
+  }
+  
+  const rivalCombinations = combinations(rivals, TOP_N_QUALIFY);
+  let isPotentiallyEliminated = false;
+
+  for (const combo of rivalCombinations) {
+    const comboPlayerIds = combo.map(p => p.id);
+
+    const internalMatches = allMatches.filter(m =>
+      m.status === 'pendiente' &&
+      m.grupo === player.grupo &&
+      comboPlayerIds.includes(m.player1Id) &&
+      comboPlayerIds.includes(m.player2Id)
+    );
+    const internalPointsToDistribute = internalMatches.length * POINTS_PER_WIN;
+
+    const potentialScores = combo.map(rival => {
+      const remainingMatchesOutsideCombo = allMatches.filter(m =>
+        m.status === 'pendiente' &&
+        m.grupo === player.grupo &&
+        ((m.player1Id === rival.id && !comboPlayerIds.includes(m.player2Id)) ||
+         (m.player2Id === rival.id && !comboPlayerIds.includes(m.player1Id)))
+      ).length;
+      
+      return {
+        ...rival,
+        potentialPoints: rival.puntos + (remainingMatchesOutsideCombo * POINTS_PER_WIN),
+      };
+    });
+
+    let totalInternalPointsNeeded = 0;
+    for (const rival of potentialScores) {
+      // Para superar al jugador (wcp), el rival necesita tener más puntos.
+      // Si tienen los mismos puntos, asumimos que no lo supera para estar del lado de la seguridad.
+      // El desempate es complejo, y para garantizar la clasificación, es mejor ser estricto.
+      if (rival.potentialPoints > wcp.puntos) {
+        continue; // Ya lo supera
+      }
+      
+      // Calculamos los puntos que necesita para superarlo estrictamente.
+      const pointsNeeded = wcp.puntos - rival.potentialPoints + 1;
+      const winsNeeded = Math.ceil(pointsNeeded / POINTS_PER_WIN);
+      totalInternalPointsNeeded += winsNeeded * POINTS_PER_WIN;
+    }
+
+    if (totalInternalPointsNeeded <= internalPointsToDistribute) {
+      // Se encontró un combo que PUEDE superar al jugador.
+      isPotentiallyEliminated = true;
+      break;
     }
   }
 
-  // Si el número de rivales que *podrían* superarle es menor que los puestos disponibles (4), está clasificado.
-  // Es decir, si como máximo 3 pueden superarle, él asegura al menos el 4º puesto.
-  if (countPotentiallyBetterThanWCP < TOP_N_QUALIFY) {
+  if (!isPotentiallyEliminated) {
     return 'qualified';
   }
-
   // --- LÓGICA DE ELIMINACIÓN ('eliminated') ---
   // Contamos cuántos rivales *garantizado* superarán el MEJOR caso del jugador (bcp)
   let countGuaranteedBetterThanBCP = 0;
@@ -104,7 +153,7 @@ export const getQualificationScenario = (
   allMatches: Match[], // No usado activamente, pero disponible
   t: TFunction,
 ): string => {
-   const status = calculateQualificationStatus(player, groupPlayers); // Re-calcula por si acaso
+   const status = calculateQualificationStatus(player, groupPlayers, allMatches); // Re-calcula por si acaso
 
   if (status !== 'pending') {
     return ''; // Solo explicamos si está pendiente
@@ -177,7 +226,7 @@ export const getQualificationScenario = (
   } else if (minWinsForChance === remainingMatchesCount) {
        // Si necesita ganar todas las partidas restantes para tener opción
        // Verificamos si, incluso ganando todo (BCP), sigue 'pending' (depende de otros)
-        const statusIfWinsAll = calculateQualificationStatus(bestCasePlayer, groupPlayers);
+        const statusIfWinsAll = calculateQualificationStatus(bestCasePlayer, groupPlayers, allMatches);
         if (statusIfWinsAll === 'pending' || statusIfWinsAll === 'eliminated') { // Si ganando todo aún no está 'qualified'
             return t('qualification.winAllAndDepend');
         } else { // Si ganando todo pasa a 'qualified'
