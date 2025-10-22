@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import Calendar from './pages/Calendar';
 import Standings from './pages/Standings';
+import Playoffs from './pages/Playoffs';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
 import Schedule from './pages/Schedule';
@@ -22,6 +23,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/calendario" element={<Calendar />} />
               <Route path="/clasificaciones" element={<Standings />} />
+              <Route path="/playoffs" element={<Playoffs />} />
               <Route path="/login" element={<Login />} />
               <Route path="/programar" element={<Schedule />} />
               <Route
