@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { playersService, Player } from '../firebase/firestore';
+import { playersService, matchesService, Player, Match } from '../firebase/firestore';
 import { calculateQualificationStatus } from '../utils/classification';
 import { assignSeeds } from '../utils/seeding';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -13,18 +13,22 @@ const Playoffs: React.FC = () => {
   const [seededPlayers, setSeededPlayers] = useState<(Player | null)[]>([]);
 
   useEffect(() => {
-    const fetchPlayers = async () => {
+    const fetchPlayersAndMatches = async () => {
       setLoading(true);
-      const allPlayers = await playersService.getAll();
+      const [allPlayers, allMatches] = await Promise.all([
+        playersService.getAll(),
+        matchesService.getAll(),
+      ]);
       const qualified = allPlayers.filter(
         (player) =>
-          calculateQualificationStatus(player, allPlayers) === 'qualified'
+          calculateQualificationStatus(player, allPlayers, allMatches) ===
+          'qualified',
       );
       setSeededPlayers(assignSeeds(qualified));
       setLoading(false);
     };
 
-    fetchPlayers();
+    fetchPlayersAndMatches();
   }, []);
 
   if (loading) {
