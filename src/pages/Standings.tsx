@@ -113,7 +113,11 @@ const Standings: React.FC = () => {
     if (!selectedGroup) return {};
     const groupPlayers = getGroupPlayers(selectedGroup);
     return groupPlayers.reduce((acc, player) => {
-      acc[player.id] = calculateQualificationStatus(player, groupPlayers);
+      acc[player.id] = calculateQualificationStatus(
+        player,
+        groupPlayers,
+        matches,
+      );
       return acc;
     }, {} as Record<string, QualificationStatus>);
   }, [selectedGroup, players, matches]);
