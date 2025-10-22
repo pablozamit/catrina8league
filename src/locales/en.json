@@ -5,10 +5,22 @@
       "calendar": "Calendar",
       "standings": "Standings",
       "admin": "Admin",
-      "schedule": "Schedule Match"
+      "schedule": "Schedule Match",
+      "playoffs": "Playoffs"
     },
     "logout": "Logout",
     "login": "Login"
+  },
+  "playoffs": {
+    "title": "Playoffs",
+    "roundOf16": "Round of 16",
+    "toBeDetermined": "To be determined"
+  },
+  "qualification": {
+    "noRemainingMatches": "No matches left to play. Classification depends on other results.",
+    "winAllAndDepend": "Needs to win all remaining matches and hope for favorable results from others.",
+    "winAtLeast": "Needs to win at least {{winsNeeded}} of the {{remainingMatches}} remaining matches.",
+    "complexScenario": "Classification is complex and depends on multiple result combinations."
   },
   "loading": "Loading...",
   "home": {
