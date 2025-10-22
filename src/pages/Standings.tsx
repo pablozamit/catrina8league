@@ -1,22 +1,27 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Skull, Ghost, Sparkles, Users } from 'lucide-react';
+import { Skull, Ghost, Sparkles, Users, Info } from 'lucide-react';
 import {
   calculateQualificationStatus,
+  getQualificationScenario,
   QualificationStatus,
 } from '../utils/classification';
 import {
   playersService,
   groupsService,
+  matchesService,
   Player,
   Group,
+  Match,
 } from '../firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
+import Tooltip from '../components/Tooltip';
 import { useTranslation } from 'react-i18next';
 
 const Standings: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedGroup, setSelectedGroup] = useState<string>('');
   const { t } = useTranslation();
@@ -28,11 +33,13 @@ const Standings: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [playersData, groupsData] = await Promise.all([
+      const [playersData, groupsData, matchesData] = await Promise.all([
         playersService.getAll(),
         groupsService.getAll(),
+        matchesService.getAll(),
       ]);
       setPlayers(playersData);
+      setMatches(matchesData);
       const sortedGroups = groupsData.sort((a, b) =>
         a.nombre.localeCompare(b.nombre),
       );
@@ -109,16 +116,16 @@ const Standings: React.FC = () => {
       acc[player.id] = calculateQualificationStatus(player, groupPlayers);
       return acc;
     }, {} as Record<string, QualificationStatus>);
-  }, [selectedGroup, players]);
+  }, [selectedGroup, players, matches]);
 
-  const getStatusShadow = (status: QualificationStatus) => {
+  const getStatusBorder = (status: QualificationStatus) => {
     switch (status) {
       case 'qualified':
-        return 'shadow-green-500/50';
+        return 'border-l-4 border-green-500';
       case 'eliminated':
-        return 'shadow-red-500/50';
+        return 'border-l-4 border-red-500';
       case 'pending':
-        return 'shadow-yellow-500/50';
+        return 'border-l-4 border-yellow-500';
       default:
         return '';
     }
@@ -208,13 +215,9 @@ const Standings: React.FC = () => {
                           position,
                         )} hover:scale-[1.02] transition-all duration-300 ${
                           index < 3 ? 'border-2 border-purple-400' : ''
-                        } ${
-                          getStatusShadow(qualificationStatusByPlayer[player.id])
-                            ? `shadow-lg ${getStatusShadow(
-                                qualificationStatusByPlayer[player.id],
-                              )}`
-                            : ''
-                        }`}
+                        } ${getStatusBorder(
+                          qualificationStatusByPlayer[player.id],
+                        )}`}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4, delay: 0.05 * index }}
@@ -236,6 +239,19 @@ const Standings: React.FC = () => {
                               >
                                 {player.nombre}
                                 {player.esNovato && ' 🎃'}
+                                {qualificationStatusByPlayer[player.id] ===
+                                  'pending' && (
+                                  <Tooltip
+                                    text={getQualificationScenario(
+                                      player,
+                                      groupPlayers,
+                                      matches,
+                                      t,
+                                    )}
+                                  >
+                                    <Info className="inline-block w-4 h-4 ml-2 text-yellow-500" />
+                                  </Tooltip>
+                                )}
                               </h3>
                               <div className="text-right">
                                 <div
