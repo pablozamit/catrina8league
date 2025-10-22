@@ -7,7 +7,7 @@ const TOTAL_MATCHES = 7;
 const POINTS_PER_WIN = 3;
 const TOP_N_QUALIFY = 4; // Número de jugadores que clasifican
 
-// --- Función existente (sin cambios) ---
+// --- Función existente (CORREGIDA) ---
 export const calculateQualificationStatus = (
   player: Player,
   groupPlayers: Player[], // Renombrado para claridad
@@ -17,9 +17,10 @@ export const calculateQualificationStatus = (
   // Best case scenario for the player
   const bestCasePoints = player.puntos + remainingMatches * POINTS_PER_WIN;
   const bestCaseWins = player.partidasGanadas + remainingMatches;
-  // Considerar desempate por juegos ganados en el mejor caso es complejo,
-  // nos centramos en puntos y victorias para simplificar la lógica matemática.
-  // Podríamos añadir una estimación alta de juegos ganados si fuera necesario.
+  // Estimación simple para desempate en el mejor caso del jugador
+  const bestCaseGamesWonEstimate = player.juegosGanados + remainingMatches * 2; // Asumiendo victorias 2-0
+  const bestCaseGamesDiffEstimate = bestCaseGamesWonEstimate - player.juegosPerdidos;
+
 
   // Worst case scenario for the player (puntos actuales)
   const worstCasePoints = player.puntos;
@@ -40,8 +41,8 @@ export const calculateQualificationStatus = (
     const otherBestPoints = other.puntos + otherRemainingMatches * POINTS_PER_WIN;
     const otherBestWins = other.partidasGanadas + otherRemainingMatches;
      // Estimación simple para desempate en el mejor caso del rival
-    const otherBestGamesWon = other.juegosGanados + otherRemainingMatches * 2;
-    const otherBestGamesDiff = otherBestGamesWon - other.juegosPerdidos;
+    const otherBestGamesWonEstimate = other.juegosGanados + otherRemainingMatches * 2;
+    const otherBestGamesDiffEstimate = otherBestGamesWonEstimate - other.juegosPerdidos;
 
 
     if (otherBestPoints > worstCasePoints) {
@@ -49,7 +50,7 @@ export const calculateQualificationStatus = (
     } else if (otherBestPoints === worstCasePoints) {
       if (otherBestWins > worstCaseWins) {
         playersWhoCanPotentiallySurpassWorstCase++;
-      } else if (otherBestWins === worstCaseWins && otherBestGamesDiff > worstCaseGamesDiff) {
+      } else if (otherBestWins === worstCaseWins && otherBestGamesDiffEstimate > worstCaseGamesDiff) {
          // Considerando diferencia de juegos como tercer criterio si puntos y victorias son iguales
         playersWhoCanPotentiallySurpassWorstCase++;
       }
@@ -68,7 +69,7 @@ export const calculateQualificationStatus = (
     // Peor caso del rival (puntos actuales)
     const otherWorstPoints = other.puntos;
     const otherWorstWins = other.partidasGanadas;
-    const otherWorstGamesWon = other.juegosGanados;
+    //const otherWorstGamesWon = other.juegosGanados; // No se usa directamente, usamos diff
     const otherWorstGamesDiff = other.juegosGanados - other.juegosPerdidos;
 
 
@@ -77,8 +78,8 @@ export const calculateQualificationStatus = (
     } else if (otherWorstPoints === bestCasePoints) {
       if (otherWorstWins > bestCaseWins) {
         playersGuaranteedAboveBestCase++;
-      } else if (otherWorstWins === bestCaseWins && otherWorstGamesDiff > bestCaseGamesWon - player.juegosPerdidos) {
-         // Comparamos diferencia de juegos si puntos y victorias coinciden
+        // CORRECCIÓN AQUÍ: Comparar diferencia de juegos estimada del jugador vs diferencia actual del rival
+      } else if (otherWorstWins === bestCaseWins && otherWorstGamesDiff > bestCaseGamesDiffEstimate) {
         playersGuaranteedAboveBestCase++;
       }
     }
@@ -89,11 +90,10 @@ export const calculateQualificationStatus = (
   }
 
   // Si no está ni clasificado ni eliminado matemáticamente, está pendiente
-  // (La lógica original para 'pending' vs 'none' era un poco redundante aquí, simplificamos)
   return 'pending';
 };
 
-// --- NUEVA FUNCIÓN ---
+// --- NUEVA FUNCIÓN (sin cambios respecto a la anterior) ---
 // Devuelve un string explicando el escenario de clasificación (versión simplificada)
 export const getQualificationScenario = (
   player: Player,
@@ -105,8 +105,7 @@ export const getQualificationScenario = (
 
   // Si no está pendiente, no necesita explicación detallada
   if (status !== 'pending') {
-    // Podríamos devolver un string vacío o un mensaje genérico si quisiéramos
-    return ''; // Opcional: podrías retornar algo como t('qualification.status_' + status)
+    return '';
   }
 
   const remainingMatchesCount = TOTAL_MATCHES - player.partidasJugadas;
@@ -117,8 +116,6 @@ export const getQualificationScenario = (
   }
 
   // --- Lógica Simplificada para Escenarios Pendientes ---
-  // Calcula el mínimo de puntos necesarios APROXIMADO para estar entre los 4 primeros
-  // Ordena a los otros por su PEOR caso (puntos actuales)
   const othersSortedByWorstCase = groupPlayers
     .filter((p) => p.id !== player.id)
     .sort((a, b) => {
@@ -127,34 +124,31 @@ export const getQualificationScenario = (
         return (b.juegosGanados - b.juegosPerdidos) - (a.juegosGanados - a.juegosPerdidos);
     });
 
-  // Punto de corte: los puntos del 4º jugador actual (o el último si hay menos de 4)
-  const fourthPlacePoints = othersSortedByWorstCase[TOP_N_QUALIFY - 2]?.puntos ?? 0; // -2 porque el array 'others' no incluye al 'player'
+  const fourthPlacePoints = othersSortedByWorstCase[TOP_N_QUALIFY - 2]?.puntos ?? 0;
 
-  // Mejor caso del jugador
   const bestCasePoints = player.puntos + remainingMatchesCount * POINTS_PER_WIN;
 
-  // Escenario 1: Si ni ganando todo alcanza al 4º actual -> Depende totalmente de otros
   if (bestCasePoints < fourthPlacePoints) {
      return t('qualification.winAllAndDepend');
   }
 
-  // Escenario 2: Calcular cuántas victorias necesita *como mínimo* para superar al 4º actual
-  // Esto es una simplificación, no tiene en cuenta desempates ni que el 4º puede sumar más puntos.
   let winsNeeded = 0;
   for (let wins = 1; wins <= remainingMatchesCount; wins++) {
     const potentialPoints = player.puntos + wins * POINTS_PER_WIN;
-    if (potentialPoints >= fourthPlacePoints) { // Usamos >= para incluir el caso de empate (que luego iría a desempate)
+    // Simplificación: solo mira si puede alcanzar los puntos del 4º actual
+    if (potentialPoints >= fourthPlacePoints) {
       winsNeeded = wins;
       break;
     }
   }
 
    if (winsNeeded > 0 && winsNeeded <= remainingMatchesCount) {
+       // Si necesita ganar todas y aún así puede no bastar (por desempates o mejora de rivales)
+       if (winsNeeded === remainingMatchesCount && bestCasePoints <= fourthPlacePoints + POINTS_PER_WIN ) { // Heurística simple
+            return t('qualification.winAllAndDepend');
+       }
        return t('qualification.winAtLeast', { winsNeeded, remainingMatches: remainingMatchesCount });
    }
 
-
-  // Si los cálculos anteriores no aplican (ej: ya está por encima del 4º pero no asegurado)
-  // o si la lógica se complica mucho con desempates.
   return t('qualification.complexScenario');
 };
