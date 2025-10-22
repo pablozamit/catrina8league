@@ -2,7 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Ghost, Sparkles, Spider, Bat } from 'lucide-react';
+// CORRECCIÓN: Se importa 'Bug' en lugar de 'Spider'
+import { Ghost, Sparkles, Bug, Bat } from 'lucide-react';
 import LanguageSelector from '../components/LanguageSelector';
 
 const Home: React.FC = () => {
@@ -23,11 +24,14 @@ const Home: React.FC = () => {
       color: 'text-purple-400',
     },
     {
-      icon: Spider,
+      // CORRECCIÓN: Se usa el icono 'Bug' aquí también si corresponde
+      // Si querías otro icono para "Programar Hechizo", cámbialo aquí.
+      // Voy a asumir que querías 'Bug' basado en el error anterior.
+      icon: Bug,
       title: 'Programar Hechizo',
       description: 'Usa el asistente para agendar tu encantamiento',
       link: '/programar',
-      color: 'text-lime-400',
+      color: 'text-lime-400', // Mantengo lime, ajusta si prefieres otro color para Bug
     },
   ];
   return (
@@ -44,7 +48,8 @@ const Home: React.FC = () => {
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <Spider className="w-16 h-16 text-gray-400" />
+          {/* CORRECCIÓN: Se usa el componente 'Bug' */}
+          <Bug className="w-16 h-16 text-gray-400" />
         </motion.div>
         <div className="absolute inset-0">
           <div className="w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(255,165,0,0.1),transparent_70%)]" />
@@ -77,6 +82,7 @@ const Home: React.FC = () => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature) => {
+            // No hay cambios aquí, Icon se asigna dinámicamente desde 'features'
             const Icon = feature.icon;
             return (
               <Link
@@ -97,4 +103,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-
