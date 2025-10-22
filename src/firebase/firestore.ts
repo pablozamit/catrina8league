@@ -9,7 +9,9 @@ import {
   orderBy, 
   onSnapshot,
   Timestamp,
-  writeBatch
+  writeBatch,
+  getDoc,
+  setDoc
 } from 'firebase/firestore';
 import { db } from './config';
 
@@ -172,6 +174,35 @@ export const matchesService = {
 
     await batch.commit();
   }
+};
+
+export const playoffsService = {
+  getPlayoffPlayers: async (): Promise<(Player | null)[]> => {
+    const docRef = doc(db, 'playoffs', 'config');
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists() && docSnap.data().playerIds) {
+      const playerIds = docSnap.data().playerIds as string[];
+      const players: (Player | null)[] = [];
+      for (const id of playerIds) {
+        if (id) {
+          const playerDoc = await getDoc(doc(db, 'players', id));
+          if (playerDoc.exists()) {
+            players.push({ id: playerDoc.id, ...playerDoc.data() } as Player);
+          } else {
+            players.push(null);
+          }
+        } else {
+          players.push(null);
+        }
+      }
+      return players;
+    }
+    return Array(16).fill(null);
+  },
+
+  setPlayoffPlayers: async (playerIds: (string | null)[]): Promise<void> => {
+    await setDoc(doc(db, 'playoffs', 'config'), { playerIds });
+  },
 };
 
 export { db, doc, writeBatch, Timestamp };
