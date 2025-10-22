@@ -8,7 +8,7 @@ interface BracketProps {
 }
 
 // Define la estructura fija de los 8 enfrentamientos de octavos por número de seed (1-16)
-const roundOf16 matchups = [
+const roundOf16matchups = [ // <-- CORRECCIÓN AQUÍ
   { seed1: 1, seed2: 16 }, // Match 1
   { seed1: 8, seed2: 9 }, // Match 2
   { seed1: 5, seed2: 12 }, // Match 3
@@ -32,7 +32,7 @@ const Bracket: React.FC<BracketProps> = ({ players }) => {
     <div className="flex justify-center p-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Mapea la estructura de enfrentamientos */}
-        {roundOf16matchups.map((matchup, index) => {
+        {roundOf16matchups.map((matchup, index) => { // <-- CORRECCIÓN AQUÍ
           const player1 = getPlayerBySeedNumber(matchup.seed1);
           const player2 = getPlayerBySeedNumber(matchup.seed2);
 
