@@ -11,12 +11,14 @@ import {
   Scroll,
   Download,
   Swords,
+  Trophy,
 } from 'lucide-react';
 import { exportToCsv, exportToJson } from '../utils/export';
 import {
   playersService,
   groupsService,
   matchesService,
+  playoffsService,
   Player,
   Group,
   Match,
@@ -33,8 +35,12 @@ const Admin: React.FC = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'players' | 'groups' | 'results'>(
-    'players',
+  const [
+    activeTab,
+    setActiveTab,
+  ] = useState<'players' | 'groups' | 'results' | 'playoffs'>('players');
+  const [playoffPlayers, setPlayoffPlayers] = useState<(string | null)[]>(
+    Array(16).fill(null),
   );
   const [showPlayerForm, setShowPlayerForm] = useState(false);
   const [showGroupForm, setShowGroupForm] = useState(false);
@@ -60,7 +66,29 @@ const Admin: React.FC = () => {
 
   useEffect(() => {
     loadData();
+    loadPlayoffData();
   }, []);
+
+  const loadPlayoffData = async () => {
+    const players = await playoffsService.getPlayoffPlayers();
+    setPlayoffPlayers(players.map((p) => p?.id || null));
+  };
+
+  const handlePlayoffPlayerChange = (index: number, playerId: string) => {
+    const newPlayoffPlayers = [...playoffPlayers];
+    newPlayoffPlayers[index] = playerId || null;
+    setPlayoffPlayers(newPlayoffPlayers);
+  };
+
+  const handleSavePlayoffs = async () => {
+    try {
+      await playoffsService.setPlayoffPlayers(playoffPlayers);
+      alert('Clasificados a playoffs guardados correctamente.');
+    } catch (error) {
+      console.error('Error guardando clasificados a playoffs:', error);
+      alert('Error guardando clasificados a playoffs.');
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -470,8 +498,63 @@ const Admin: React.FC = () => {
               <Scroll className="inline-block w-5 h-5 mr-2" />
               Resultados
             </button>
+            <button
+              onClick={() => setActiveTab('playoffs')}
+              className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                activeTab === 'playoffs'
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
+                  : 'text-gray-400 hover:text-purple-400'
+              }`}
+            >
+              <Trophy className="inline-block w-5 h-5 mr-2" />
+              Playoffs
+            </button>
           </div>
         </div>
+
+        {activeTab === 'playoffs' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-orange-400">
+                Configuración de Playoffs
+              </h2>
+              <button
+                onClick={handleSavePlayoffs}
+                className="btn btn-primary flex items-center space-x-2"
+              >
+                <Save className="w-5 h-5" />
+                <span>Guardar Clasificados</span>
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {playoffPlayers.map((playerId, index) => (
+                <div key={index} className="flex flex-col">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Posición {index + 1}
+                  </label>
+                  <select
+                    value={playerId || ''}
+                    onChange={(e) =>
+                      handlePlayoffPlayerChange(index, e.target.value)
+                    }
+                    className="w-full px-4 py-2 bg-gray-900/50 border border-gray-600 rounded-lg focus:border-purple-500 text-white"
+                  >
+                    <option value="">Seleccionar jugador</option>
+                    {players.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {activeTab === 'results' && (
           <motion.div
