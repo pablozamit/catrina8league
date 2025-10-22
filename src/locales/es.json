@@ -5,10 +5,22 @@
       "calendar": "Calendario",
       "standings": "Clasificaciones",
       "admin": "Admin",
-      "schedule": "Programar Partido"
+      "schedule": "Programar Partido",
+      "playoffs": "Playoffs"
     },
     "logout": "Salir",
     "login": "Entrar"
+  },
+  "playoffs": {
+    "title": "Playoffs",
+    "roundOf16": "Octavos de Final",
+    "toBeDetermined": "Por determinar"
+  },
+  "qualification": {
+    "noRemainingMatches": "No le quedan partidas por jugar. Su clasificación depende de otros resultados.",
+    "winAllAndDepend": "Necesita ganar todas sus partidas restantes y que otros resultados le favorezcan.",
+    "winAtLeast": "Necesita ganar al menos {{winsNeeded}} de las {{remainingMatches}} partidas restantes.",
+    "complexScenario": "Su clasificación es compleja y depende de múltiples combinaciones de resultados."
   },
   "loading": "Cargando...",
   "home": {
