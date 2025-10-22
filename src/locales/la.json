@@ -5,10 +5,22 @@
       "calendar": "Calendarium",
       "standings": "Classificatio",
       "admin": "Admin",
-      "schedule": "Certamen Disponere"
+      "schedule": "Certamen Disponere",
+      "playoffs": "Playoffs"
     },
     "logout": "Exire",
     "login": "Intrare"
+  },
+  "playoffs": {
+    "title": "Playoffs",
+    "roundOf16": "Octavi Finales",
+    "toBeDetermined": "Determinandum"
+  },
+  "qualification": {
+    "noRemainingMatches": "Nulli ludi reliqui. Classificatio ex aliis eventibus pendet.",
+    "winAllAndDepend": "Oportet omnes ludos restantes vincere et sperare in aliis eventibus prosperis.",
+    "winAtLeast": "Oportet vincere saltem {{winsNeeded}} ex {{remainingMatches}} ludis reliquis.",
+    "complexScenario": "Classificatio complexa est et ex multis eventuum combinationibus pendet."
   },
   "loading": "Onerans...",
   "home": {
