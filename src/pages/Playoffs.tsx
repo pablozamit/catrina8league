@@ -1,29 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react'; // Eliminados useState y useEffect
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { playoffsService, Player } from '../firebase/firestore';
-import LoadingSpinner from '../components/LoadingSpinner';
-import Bracket from '../components/Bracket';
+// Eliminados imports de firestore, classification, seeding, LoadingSpinner
+import Bracket from '../components/Bracket'; // Mantenemos la importación del Bracket
 
 const Playoffs: React.FC = () => {
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(true);
-  const [seededPlayers, setSeededPlayers] = useState<(Player | null)[]>([]);
+  // Eliminados los estados loading y seededPlayers
+  // Eliminado el useEffect para fetchPlayers
 
-  useEffect(() => {
-    const fetchPlayoffPlayers = async () => {
-      setLoading(true);
-      const players = await playoffsService.getPlayoffPlayers();
-      setSeededPlayers(players);
-      setLoading(false);
-    };
-
-    fetchPlayoffPlayers();
-  }, []);
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  // Ya no se necesita el estado de carga
+  // if (loading) {
+  //   return <LoadingSpinner />;
+  // }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -39,7 +28,9 @@ const Playoffs: React.FC = () => {
         <h2 className="text-2xl text-gray-300">{t('playoffs.roundOf16')}</h2>
       </motion.div>
 
-      <Bracket players={seededPlayers} />
+      {/* Renderiza Bracket sin pasarle props */}
+      <Bracket />
+
     </div>
   );
 };
