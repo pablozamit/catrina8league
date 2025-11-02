@@ -10,23 +10,23 @@ interface BracketProps {
 // Define la estructura fija con los textos EXACTOS de tu HTML
 const roundOf16Matchups = [
   // Lado Izquierdo
-  { id: 1, p1Text: 'nica', p2Text: 'Amauris' },
-  { id: 2, p1Text: 'Mina', p2Text: '3º mejor clasificado grupo 2' },
-  { id: 3, p1Text: 'Mejor clasificado grupo 2', p2Text: 'Evodia' },
-  { id: 4, p1Text: 'pablo', p2Text: 'Román' },
+  { id: 1, p1Text: 'nica', p2Text: 'Amauris', winner: 'p2' },
+  { id: 2, p1Text: 'Mina', p2Text: 'Sasa' },
+  { id: 3, p1Text: 'Jonathan', p2Text: 'Evo' },
+  { id: 4, p1Text: 'pablo', p1Score: 5, p2Text: 'Román', p2Score: 4, winner: 'p1' },
   // Lado Derecho
-  { id: 5, p1Text: '2º mejor clasificado grupo 2', p2Text: 'Damián' },
+  { id: 5, p1Text: 'Damián', p2Text: 'Ángel S.' },
   { id: 6, p1Text: 'artur', p2Text: 'nino' },
-  { id: 7, p1Text: 'angel', p2Text: 'alvaro' },
+  { id: 7, p1Text: 'angel', p2Text: 'alvaro', winner: 'p2' },
   { id: 8, p1Text: 'johhny', p1Score: 3, p2Text: 'alex f.', p2Score: 5, winner: 'p2' },
 ];
 
 // Estructura para cuartos de final
 const quarterfinalsMatchups = [
-    { id: 9, p1Text: 'Ganador de nica/Amauris', p2Text: 'Ganador de Mina/3º mejor clasificado grupo 2' },
-    { id: 10, p1Text: 'Ganador de Mejor clasificado grupo 2/Evodia', p2Text: 'Ganador de pablo/Román' },
-    { id: 11, p1Text: 'Ganador de 2º mejor clasificado grupo 2/Damián', p2Text: 'Ganador de artur/nino' },
-    { id: 12, p1Text: 'Ganador de angel/alvaro', p2Text: 'alex f.' },
+    { id: 9, p1Text: 'Amauris', p2Text: 'Ganador de Mina/Sasa' },
+    { id: 10, p1Text: 'Ganador de Jonathan/Evo', p2Text: 'pablo' },
+    { id: 11, p1Text: 'Ganador de Damián/Ángel S.', p2Text: 'Ganador de artur/nino' },
+    { id: 12, p1Text: 'alvaro', p2Text: 'alex f.' },
 ];
 
 // Componente para un slot de texto en el bracket
