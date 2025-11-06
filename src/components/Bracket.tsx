@@ -11,22 +11,22 @@ interface BracketProps {
 const roundOf16Matchups = [
   // Lado Izquierdo
   { id: 1, p1Text: 'nica', p2Text: 'Amauris', winner: 'p2' },
-  { id: 2, p1Text: 'Mina', p2Text: 'Sasa' },
+  { id: 2, p1Text: 'Mina', p2Text: 'Sasa', winner: 'p2' },
   { id: 3, p1Text: 'Jonathan', p2Text: 'Evo' },
   { id: 4, p1Text: 'pablo', p1Score: 5, p2Text: 'Román', p2Score: 4, winner: 'p1' },
   // Lado Derecho
-  { id: 5, p1Text: 'Damián', p2Text: 'Ángel S.' },
-  { id: 6, p1Text: 'artur', p2Text: 'nino' },
+  { id: 5, p1Text: 'Damián', p2Text: 'Ángel S.', winner: 'p2' },
+  { id: 6, p1Text: 'artur', p2Text: 'nino', winner: 'p1' },
   { id: 7, p1Text: 'angel', p2Text: 'alvaro', winner: 'p2' },
   { id: 8, p1Text: 'johhny', p1Score: 3, p2Text: 'alex f.', p2Score: 5, winner: 'p2' },
 ];
 
 // Estructura para cuartos de final
 const quarterfinalsMatchups = [
-    { id: 9, p1Text: 'Amauris', p2Text: 'Ganador de Mina/Sasa' },
+    { id: 9, p1Text: 'Amauris', p1Score: 5, p2Text: 'Sasa', p2Score: 0, winner: 'p1' },
     { id: 10, p1Text: 'Ganador de Jonathan/Evo', p2Text: 'pablo' },
-    { id: 11, p1Text: 'Ganador de Damián/Ángel S.', p2Text: 'Ganador de artur/nino' },
-    { id: 12, p1Text: 'alvaro', p2Text: 'alex f.' },
+    { id: 11, p1Text: 'Ángel S.', p2Text: 'artur' },
+    { id: 12, p1Text: 'alvaro', p2Text: 'alex f.', winner: 'p1' },
 ];
 
 // Componente para un slot de texto en el bracket
@@ -72,9 +72,17 @@ const Bracket: React.FC<BracketProps> = () => {
         <div className="flex flex-col justify-around gap-y-10 md:gap-y-16 w-1/2">
           {leftMatchups.map((matchup) => (
             <div key={matchup.id} className="flex flex-col space-y-1 bg-black/40 p-3 rounded-lg border border-purple-500/30 shadow-lg shadow-purple-900/40">
-              <TextSlot text={matchup.p1Text} />
+              <TextSlot 
+                text={matchup.p1Text} 
+                score={matchup.p1Score} 
+                isWinner={matchup.winner === 'p1'} 
+              />
               <div className="text-center text-xs font-bold text-red-400 py-1">VS</div>
-              <TextSlot text={matchup.p2Text} />
+              <TextSlot 
+                text={matchup.p2Text} 
+                score={matchup.p2Score} 
+                isWinner={matchup.winner === 'p2'} 
+              />
             </div>
           ))}
         </div>
@@ -82,9 +90,17 @@ const Bracket: React.FC<BracketProps> = () => {
         <div className="flex flex-col justify-around gap-y-24 md:gap-y-48 w-1/2 pt-12 md:pt-24 pl-4">
           {quarterfinalsMatchups.slice(0, 2).map((matchup) => (
             <div key={matchup.id} className="flex flex-col space-y-1 bg-black/30 p-3 rounded-lg border border-blue-500/30 shadow-lg shadow-blue-900/40">
-              <TextSlot text={matchup.p1Text} />
+               <TextSlot 
+                text={matchup.p1Text} 
+                score={matchup.p1Score} 
+                isWinner={matchup.winner === 'p1'} 
+              />
               <div className="text-center text-xs font-bold text-red-400 py-1">VS</div>
-              <TextSlot text={matchup.p2Text} />
+              <TextSlot 
+                text={matchup.p2Text} 
+                score={matchup.p2Score} 
+                isWinner={matchup.winner === 'p2'} 
+              />
             </div>
           ))}
         </div>
@@ -101,9 +117,17 @@ const Bracket: React.FC<BracketProps> = () => {
         <div className="flex flex-col justify-around gap-y-24 md:gap-y-48 w-1/2 pt-12 md:pt-24 pr-4">
           {quarterfinalsMatchups.slice(2, 4).map((matchup) => (
             <div key={matchup.id} className="flex flex-col space-y-1 bg-black/30 p-3 rounded-lg border border-blue-500/30 shadow-lg shadow-blue-900/40">
-              <TextSlot text={matchup.p1Text} />
+               <TextSlot 
+                text={matchup.p1Text} 
+                score={matchup.p1Score} 
+                isWinner={matchup.winner === 'p1'} 
+              />
               <div className="text-center text-xs font-bold text-red-400 py-1">VS</div>
-              <TextSlot text={matchup.p2Text} />
+              <TextSlot 
+                text={matchup.p2Text} 
+                score={matchup.p2Score} 
+                isWinner={matchup.winner === 'p2'} 
+              />
             </div>
           ))}
         </div>
