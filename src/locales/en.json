@@ -165,19 +165,10 @@
     "li37": "In addition to that Open, new players will also be able to enter the system through the Monday tournaments:",
     "p32": "Their first ranked matches will serve to estimate their initial level.",
     "p33": "From there, their ELO will be adjusted just like everyone else's, depending on who they play against and what results they get.",
-    "li38": "Current ranking",
-    "li39": "As of today, the ELO ranking of La Catrina has been calculated with:",
-    "p34": "The results of the previous Summer League and the 2025 Autumn League (to have a sufficiently large sample of matches).",
-    "li40": "The Monday tournaments that have been marked as ranked up to this moment.",
-    "li41": "This ranking is the starting point of the race to the Vitoria 2026 National:",
-    "h2_9": "As you play leagues and Monday tournaments, your ELO will go up or down.",
-    "p35": "At the end of the 2026 Summer League, the top 4 in the ranking will be chosen to represent La Catrina in the national tournament.",
-    "li42": "Updated ELO Ranking:",
-    "li43": "Update date: 12/01/2025",
-    "p36": "Artur - 1857",
-    "li44": "Amauris - 1778",
-    "li45": "Fer - 1623",
-    "p37": "Johnny - 1615",
-    "p38": "Pablo - 1606"
+    "p34": "At the end of the 2026 Summer League, the top 4 in the ranking will be chosen to represent La Catrina in the national tournament.",
+    "p35": "As you play leagues and Monday tournaments, your ELO will go up or down.",
+    "p36": "The results of the previous Summer League and the 2025 Autumn League (to have a sufficiently large sample of matches).",
+    "p37": "The Monday tournaments that have been marked as ranked up to this moment.",
+    "p38": "Updated ELO Ranking (12/01/2025):"
   }
 }
