@@ -9,6 +9,7 @@ import Playoffs from './pages/Playoffs';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
 import Schedule from './pages/Schedule';
+import Ranking from './pages/Ranking';
 import ProtectedRoute from './components/ProtectedRoute';
 import './index.css';
 
@@ -26,6 +27,7 @@ function App() {
               <Route path="/playoffs" element={<Playoffs />} />
               <Route path="/login" element={<Login />} />
               <Route path="/programar" element={<Schedule />} />
+              <Route path="/ranking" element={<Ranking />} />
               <Route
                 path="/admin"
                 element={
