@@ -6,7 +6,8 @@
       "standings": "Classificatio",
       "admin": "Admin",
       "schedule": "Certamen Disponere",
-      "playoffs": "Playoffs"
+      "playoffs": "Playoffs",
+      "ranking": "Liga Aestiva 2026 & Ordo Annualis"
     },
     "logout": "Exire",
     "login": "Intrare"
@@ -77,5 +78,9 @@
     "submit": "Intrare",
     "footer1": "Solum administratores auctoritate accedere possunt",
     "footer2": "Difficultates aditum? Administatori contactum fac"
+  },
+  "ranking": {
+    "title": "Systema Ordinis ELO et Liga Aestiva 2026",
+    "p38": "Ordo ELO renovatus (01/12/2025):"
   }
 }
