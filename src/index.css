@@ -293,3 +293,66 @@ input:focus, textarea:focus, select:focus {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, var(--neon-purple), var(--neon-blue));
 }
+
+/* Estilos específicos para la página de Ranking */
+.ranking-content {
+  line-height: 1.8;
+}
+
+.ranking-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--neon-orange);
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+}
+
+.ranking-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffa366;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.ranking-content p {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #d1d5db;
+  margin-bottom: 1rem;
+}
+
+.ranking-content ul, 
+.ranking-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+  color: #9ca3af;
+}
+
+.ranking-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.ranking-content strong {
+  color: var(--neon-orange);
+  font-weight: 700;
+}
+
+/* Ajustes para móvil */
+@media (max-width: 768px) {
+  .ranking-content h2 {
+    font-size: 1.25rem;
+  }
+  
+  .ranking-content h3 {
+    font-size: 1.125rem;
+  }
+  
+  .ranking-content p {
+    font-size: 0.9375rem;
+  }
+}
