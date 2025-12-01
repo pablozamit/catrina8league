@@ -20,7 +20,7 @@ const Header: React.FC = () => {
     { name: t('header.nav.calendar'), path: '/calendario', icon: Calendar },
     { name: t('header.nav.standings'), path: '/clasificaciones', icon: Trophy },
     { name: t('header.nav.playoffs'), path: '/playoffs', icon: Swords },
-    { name: t('header.nav.schedule'), path: '/programar', icon: MessageCircle },
+    { name: t('header.nav.ranking'), path: '/ranking', icon: Trophy },
   ];
 
   const isActive = (path: string) => location.pathname === path;
